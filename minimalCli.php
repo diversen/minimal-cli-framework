@@ -46,6 +46,16 @@ class minimalCli {
 
 	}
 
+	// From pear commandline
+	public function wrap($text, $lw=null) {
+        	if ($this->line_width > 0) {
+            		if ($lw === null) {
+                		$lw = $this->line_width;
+            		}
+            		return wordwrap($text, $lw, "\n", false);
+        	}
+        	return $text;
+    	}
 
 }
 
