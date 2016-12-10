@@ -6,56 +6,105 @@ use diversen\parseArgv;
 
 class minimalCli {
 
-	public $commands = [];
-	public $values = [];
-	public $flags = [];
+    public $commands = [];
+    public $parse = null;
 
-	public function run () {
-		$parse = new parseArgv();
-		$this->values = $parse->values;
-		$this->flags = $parse->flags;
+    /**
+     * Run the CLI program
+     */
+    public function run() {
+        $this->parse = new parseArgv();
+        $executed = false;
+        // Look for first sub command
+        foreach ($this->commands as $key => $command) {
+            
+            if (isset($this->parse->values[$key])) {
+                $this->execute($key);
+                $executed = true;
+            }
+        }
+        
+        if (!$executed) {
+            $this->displayHelp();
+        }
+    }
+    
 
-		// Look for first sub command
-		foreach($this->commands as $key => $command) {
-			if (isset($parse->values[$key])) {
-				$this->execute($key);		
-			}
-		
-		}
-	}
+    public function getHelp () {
+        
+        $help = [];
+        foreach ($this->commands as $key => $command) {
+            if (method_exists($command, 'getHelp')) {
+                
+                $help[$key] = $command->getHelp();
+            }
+        }
+        return $help;
+    }
+    
+    /**
+     * Displays help text
+     */
+    public function displayHelp () {
+        $helps = $this->getHelp();
+        echo $length = $this->getMaxHelpLength($helps) +1;
+        
+        $str =  "Available commands" . PHP_EOL;
+        foreach ($helps as $key => $help) {
+            
+            $str.= str_pad($key, $length , ' '); 
+            $str.= $help['main'] . PHP_EOL;
+        }
+        echo $str;
+    }
+    
+    public function getMaxHelpLength ($helps) {
+        
+        $max_length = 0;
+        foreach($helps as $key => $help) {
+            $length = strlen($key);
+            if ($length > $max_length){
+                $max_length = $length;
+            }
+        }
+        return $max_length;
+    }
 
-	public function execute($command) {
-		$obj = $this->commands[$command];
-		if (isset($this->flags['help'])) {
-			if (method_exists($obj, 'help')) {
-				echo $obj->help();
-			}
-		}
+    /**
+     * Execute a command
+     * @param type $command
+     */
+    public function execute($command) {
+        $obj = $this->commands[$command];
+        if (isset($this->parse->flags['help'])) {
+            if (method_exists($obj, 'help')) {
+                echo $obj->help();
+            }
+        }
 
-		$obj->run($this);
-	}
-	
-	/**
-	 * Get terminal width
-	 */
-	public function getTerminalWidth () {
-		return 80;	
-	}
+        $obj->run($this->parse);
+    }
 
-	public function outputMessage () {
+    /**
+     * Get terminal width
+     */
+    public function getTerminalWidth() {
+        return 80;
+    }
 
-	}
+    public function outputMessage() {
+        
+    }
 
-	// From pear commandline
-	public function wrap($text, $lw=null) {
-        	if ($this->line_width > 0) {
-            		if ($lw === null) {
-                		$lw = $this->line_width;
-            		}
-            		return wordwrap($text, $lw, "\n", false);
-        	}
-        	return $text;
-    	}
+    /**
+     * 
+     * @param type $text
+     * @param type $lw
+     * @return type
+     */
+    public function wrap($text) {
 
+        $lw = $this->getTerminalWidth();
+        return wordwrap($text, $lw, "\n", false);
+    }
 }
-

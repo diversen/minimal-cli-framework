@@ -6,20 +6,35 @@ include_once "minimalCli.php";
 use diversen\minimalCli;
 
 class echoTest {
-	// Optional help
-	public function help () {
-		return "some help";
-	}
 
-	// The command
-	// The run command should get the option
-	// From the commandline. You can then 
-	// Make sub-command to your main command
-	// ./cli test --test='hello world'
-	public function run ($opts) {
-		echo "Executing echo command\n";
-	}
+    // Return main commands help
+    public function getHelp() {
+        return 
+            array (
+                'main' => 'Command to make string to upper and lower case',
+                'options' => array (
+                    '--struppr' => 'Will put string in uppercase',
+                    '--lower' => 'Will put string in lowercase'),
+                
+                'arguments' => array (
+                    'File' => 'File to use',
+                    'Version' => 'Version'
+                )
+            );
+    }
 
+    /**
+     * 
+     * @param diversen\parseArgv $args
+     */
+    public function run($args) {
+        if ($args->getFlag('strtoupper')) {
+            echo strtoupper($args->getFlag('strtoupper')) . PHP_EOL;
+        }
+        if ($args->getFlag('strtolower')) {
+            echo strtolower($args->getFlag('strtolower')) . PHP_EOL;
+        }      
+    }
 }
 
 $echo = new echoTest;
