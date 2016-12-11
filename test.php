@@ -5,20 +5,19 @@ include_once "minimalCli.php";
 
 use diversen\minimalCli;
 
-class echoTest {
+class echoTest extends minimalCli {
 
     // Return main commands help
     public function getHelp() {
         return 
             array (
-                'main' => 'Command to make string to upper and lower case',
+                'usage' => 'Command to make string to upper and lower case',
                 'options' => array (
-                    '--struppr' => 'Will put string in uppercase',
-                    '--lower' => 'Will put string in lowercase'),
+                    '--strtoupper' => 'Will put string in uppercase',
+                    '--strtolower' => 'Will put string in lowercase'),
                 
                 'arguments' => array (
-                    'File' => 'File to use',
-                    'Version' => 'Version'
+                    'File' => 'Read from a file and out put to stdout'
                 )
             );
     }
@@ -27,19 +26,44 @@ class echoTest {
      * 
      * @param diversen\parseArgv $args
      */
-    public function run($args) {
+    public function runCommand($args) {
+
+        $file = $args->getValueByKey(0);
+        if ($file) {
+            $str = $this->getFileStr($file);
+        } else {
+            echo "Specify file" . "\n";
+        }
+        
         if ($args->getFlag('strtoupper')) {
-            echo strtoupper($args->getFlag('strtoupper')) . PHP_EOL;
+            echo strtoupper($str) . "\n";
         }
         if ($args->getFlag('strtolower')) {
-            echo strtolower($args->getFlag('strtolower')) . PHP_EOL;
-        }      
+            echo strtolower($str) . PHP_EOL;
+        }
+    }
+    
+    public function getFileStr ($file) {
+        if ($file && file_exists($file)) {
+            return file_get_contents($file);  
+        } 
     }
 }
 
-$echo = new echoTest;
+$header = <<<EOF
+ _____         _   
+|_   _|       | |  
+  | | ___  ___| |_ 
+  | |/ _ \/ __| __|
+  | |  __/\__ \ |_ 
+  \_/\___||___/\__|
+
+A Modulized Command line program
+EOF;
+
+$echo = new echoTest();
 $commands['echo'] = $echo;
-$m = new minimalCli;
+$m = new minimalCli();
 $m->commands = $commands;
-$m->run();
-$m->getTerminalWidth();
+$m->header = $header;
+$m->runMain();

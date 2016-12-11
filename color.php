@@ -1,6 +1,6 @@
 <?php
 
-$loader = 'vendor/autoload.php';
+include_once "../../../vendor/autoload.php";
 $consoleColor = new JakubOnderka\PhpConsoleColor\ConsoleColor();
 echo "Colors are supported: " . ($consoleColor->isSupported() ? 'Yes' : 'No') . "\n";
 echo "256 colors are supported: " . ($consoleColor->are256ColorsSupported() ? 'Yes' : 'No') . "\n\n";

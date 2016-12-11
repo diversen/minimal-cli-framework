@@ -1,0 +1,17 @@
+{
+    "name": "diversen/minimal-cli-framework",
+    "description": "A very fast and simple CLI framework",
+    "type": "library",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Dennis Iversen",
+            "email": "dennis.iversen@gmail.com"
+        }
+    ],
+    "require": {
+        "diversen/parse-argv": "dev-master",
+        "jakub-onderka/php-console-color": "^0.1.0",
+        "diversen/console-padding": "^1.0"
+    }
+}
