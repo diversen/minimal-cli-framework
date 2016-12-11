@@ -202,10 +202,6 @@ class minimalCli {
         return 80;
     }
 
-    public function outputMessage() {
-        
-    }
-
     /**
      * 
      * @param type $text
