@@ -28,11 +28,13 @@ class echoTest extends minimalCli {
      */
     public function runCommand($args) {
 
+        $str = '';
         $file = $args->getValueByKey(0);
         if ($file) {
             $str = $this->getFileStr($file);
         } else {
             echo "Specify file" . "\n";
+            exit(0);
         }
         
         if ($args->getFlag('strtoupper')) {
@@ -41,6 +43,7 @@ class echoTest extends minimalCli {
         if ($args->getFlag('strtolower')) {
             echo strtolower($str) . PHP_EOL;
         }
+        return 0;
     }
     
     public function getFileStr ($file) {

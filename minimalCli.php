@@ -15,9 +15,7 @@ class minimalCli {
     public $colorError = 'red';
     public $header = 'Minmal-cli-framework';
     
-    public function __constract() {
-        
-    }
+    public function __constract() {}
 
     
     public function getHelpMain () {
@@ -34,23 +32,19 @@ class minimalCli {
      */
     public function runMain() {
         $this->parse = new parseArgv();
-        
-        $executed = false;
                
         // Look for command
         foreach ($this->commands as $key => $command) {
             
-            if ($this->parse->getValue($key)) {
-                
+            if ($this->parse->getValue($key)) {             
                 $this->parse->unsetValueByValue($key);
-                $this->execute($key);
-                $executed = true;
+                $res = $this->execute($key);
+                exit($res);
             }
         }
-        
-        if (!$executed) {
-            $this->executeMainHelp();
-        }
+
+        $this->executeMainHelp();
+
     }
     
 
@@ -162,7 +156,7 @@ class minimalCli {
             }
         }
 
-        $obj->runCommand($this->parse);
+        return $obj->runCommand($this->parse);
     }
     
     public function executeCommandHelp($command) {
