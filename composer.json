@@ -10,7 +10,8 @@
         }
     ],
     "require": {
-        "diversen/parse-argv": "^1.0",
-        "jakub-onderka/php-console-color": "^0.1.0"
+        "diversen/parse-argv": "dev-master",
+        "jakub-onderka/php-console-color": "^0.1.0",
+        "diversen/console-padding": "^1.0"
     }
 }
