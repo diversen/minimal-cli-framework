@@ -7,5 +7,6 @@ Install: (Not on packagist yet!)
     composer require diversen/minimal-cli-framework
 
 
-Point: A very simple and very fast CLI framework for PHP
+See [test.php](test.php)
 
+License: MIT
