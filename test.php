@@ -16,6 +16,10 @@ class echoTest extends minimalCli {
                 'options' => array (
                     '--strtoupper' => 'Will put string in uppercase',
                     '--strtolower' => 'Will put string in lowercase'),
+                // Add a main options, which all commands will have access to
+                'main_options' => array (
+                    '--main' => 'Test with a main option'
+                ),
                 
                 'arguments' => array (
                     'File' => 'Read from a file and out put to stdout'
