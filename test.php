@@ -1,3 +1,4 @@
+#!/usr/bin/env php
 <?php
 
 include_once "vendor/autoload.php";
@@ -61,7 +62,6 @@ $header = <<<EOF
   | |  __/\__ \ |_ 
   \_/\___||___/\__|
 
-A Modulized Command line program
 EOF;
 
 $echo = new echoTest();

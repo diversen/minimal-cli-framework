@@ -20,9 +20,8 @@ class minimalCli {
     
     public function getHelpMain () {
         return array (
-            'usage' => 'A test commandline program using minimal-cli-framework',
             'options' => array (
-                    '--help' => 'Will output help',
+                    '--help' => 'Will output help. Specify command followed by --help to get specific help on a command',
                     '--verbose' => 'verbose output')
         );
     }
@@ -64,15 +63,17 @@ class minimalCli {
      */
     public function executeMainHelp () {
         
-        $str = $this->header . PHP_EOL . PHP_EOL;
-        
+	global $argv;
+	$str = $this->header . PHP_EOL . PHP_EOL;
+
         $p = new padding();
         
-        // command [options] [arguments]
         $help_main = $this->getHelpMain();
         
         $str.= $this->colorOutput('Usage', $this->colorNotice) . PHP_EOL;
-        $str.= '  ' . $help_main['usage'] . PHP_EOL . PHP_EOL;
+
+	$str.= '  ' . $this->colorOutput($argv[0], $this->colorSuccess) . ' [--options] [command] [--options] [arguments]' . PHP_EOL . PHP_EOL;        
+        //$str.= '  ' . $help_main['usage'] . PHP_EOL . PHP_EOL;
         
         $main_options = $help_main['options'];
         
