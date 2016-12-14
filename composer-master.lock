@@ -4,12 +4,12 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "eb3a966b7efa4ffda2d9a37b2c0f7794",
-    "content-hash": "8ce5a8f96dfa911ddaf4cafa0f397d56",
+    "hash": "eb78e3de59409ea7b852e79c54c10201",
+    "content-hash": "2c28ef9d5556cdd30d92cef76edccd34",
     "packages": [
         {
             "name": "diversen/console-padding",
-            "version": "dev-master",
+            "version": "v1.0.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/diversen/console-padding.git",
@@ -143,9 +143,7 @@
     "packages-dev": [],
     "aliases": [],
     "minimum-stability": "stable",
-    "stability-flags": {
-        "diversen/console-padding": 20
-    },
+    "stability-flags": [],
     "prefer-stable": false,
     "prefer-lowest": false,
     "platform": [],
