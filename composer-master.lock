@@ -4,21 +4,21 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "eafb68fdea50b66ddc51111d97e54ff0",
-    "content-hash": "d9befed75b0cc494d51ae14d518eb379",
+    "hash": "eb3a966b7efa4ffda2d9a37b2c0f7794",
+    "content-hash": "8ce5a8f96dfa911ddaf4cafa0f397d56",
     "packages": [
         {
             "name": "diversen/console-padding",
-            "version": "v1.0.0",
+            "version": "dev-master",
             "source": {
                 "type": "git",
                 "url": "https://github.com/diversen/console-padding.git",
-                "reference": "7e27702f17095efcdfdf0171682d082853682088"
+                "reference": "06c157d9a2d4525838b745f95549806d2f0ded7d"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/diversen/console-padding/zipball/7e27702f17095efcdfdf0171682d082853682088",
-                "reference": "7e27702f17095efcdfdf0171682d082853682088",
+                "url": "https://api.github.com/repos/diversen/console-padding/zipball/06c157d9a2d4525838b745f95549806d2f0ded7d",
+                "reference": "06c157d9a2d4525838b745f95549806d2f0ded7d",
                 "shasum": ""
             },
             "type": "library",
@@ -48,26 +48,26 @@
                 "console",
                 "padding"
             ],
-            "time": "2016-12-11 13:45:03"
+            "time": "2016-12-12 19:55:34"
         },
         {
             "name": "diversen/parse-argv",
-            "version": "dev-master",
+            "version": "v1.2.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/diversen/parse-argv.git",
-                "reference": "492cb00421a5bbef158c6da279010ec023af5c74"
+                "reference": "f87be758b9e15f5b3c84a425124c430287cba9ae"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/diversen/parse-argv/zipball/492cb00421a5bbef158c6da279010ec023af5c74",
-                "reference": "492cb00421a5bbef158c6da279010ec023af5c74",
+                "url": "https://api.github.com/repos/diversen/parse-argv/zipball/f87be758b9e15f5b3c84a425124c430287cba9ae",
+                "reference": "f87be758b9e15f5b3c84a425124c430287cba9ae",
                 "shasum": ""
             },
             "type": "library",
             "extra": {
                 "branch-alias": {
-                    "dev-master": "1.0-dev"
+                    "dev-master": "v1.2-dev"
                 }
             },
             "autoload": {
@@ -94,7 +94,7 @@
                 "cli",
                 "console"
             ],
-            "time": "2016-12-11 15:17:18"
+            "time": "2016-12-14 18:19:27"
         },
         {
             "name": "jakub-onderka/php-console-color",
@@ -144,7 +144,7 @@
     "aliases": [],
     "minimum-stability": "stable",
     "stability-flags": {
-        "diversen/parse-argv": 20
+        "diversen/console-padding": 20
     },
     "prefer-stable": false,
     "prefer-lowest": false,

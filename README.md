@@ -2,7 +2,7 @@
 
 A very simple CLI framework
 
-Install: (Not on packagist yet!)
+Install:
 
     composer require diversen/minimal-cli-framework
 
