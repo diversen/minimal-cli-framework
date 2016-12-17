@@ -8,6 +8,10 @@ use diversen\padding;
 
 class minimalCli {
 
+    /**
+     * Array holding command objects
+     * @var array $commands 
+     */
     public $commands = [];
     
     /**
@@ -15,9 +19,29 @@ class minimalCli {
      * @var \diversen\parseArgv
      */
     public $parse = null;
-    public $colorSuccess = 'green';
-    public $colorNotice = 'yellow';
-    public $colorError = 'red';
+    
+    /**
+     * Color of success
+     * @var string $colorSuccess
+     */
+    public static $colorSuccess = 'green';
+    
+    /**
+     * Color of notice
+     * @var string $colorNotice
+     */
+    public static $colorNotice = 'yellow';
+    
+    /**
+     * Color of error
+     * @var string $colorError
+     */
+    public static $colorError = 'red';
+    
+    /**
+     * Set a header notice 
+     * @var string $header
+     */
     public $header = 'Minmal-cli-framework';
     
     public function __constract() {}
@@ -91,31 +115,34 @@ class minimalCli {
         $help_main = $this->getHelpMain();
         
         // Usage
-        $str.= $this->colorOutput('Usage', $this->colorNotice) . PHP_EOL;
-	$str.= '  ' . $this->colorOutput($argv[0], $this->colorSuccess) . ' [--options] [command] [--options] [arguments]' . PHP_EOL . PHP_EOL;
+        $str.= self::colorOutput('Usage', self::$colorNotice) . PHP_EOL;
+	$str.= '  ' . self::colorOutput($argv[0], self::$colorSuccess) . ' [--options] [command] [--options] [arguments]' . PHP_EOL . PHP_EOL;
         
         $main_options = $help_main['main_options'];
-        $ary = [];
+        $ary_main = [];
         foreach($main_options as $option => $desc) {
-            $ary[] = array (
-                $this->colorOutput($option, $this->colorSuccess), $desc
+            $ary_main[] = array (
+                self::colorOutput($option, self::$colorSuccess), $desc
             );
         }
         
-        $str.= $this->colorOutput('Options across all commands', $this->colorNotice) . PHP_EOL;
-        $str.= $p->padArray($ary) . PHP_EOL;
+        $str.= self::colorOutput('Options across all commands', self::$colorNotice) . PHP_EOL;
+        $str.= $p->padArray($ary_main) . PHP_EOL;
         
         $help_ary = $this->getHelp();
         
-        $ary = [];
+        print_r($help_ary);
+        
+        $ary_sub = [];
         foreach($help_ary as $key => $val) {
-            $a[] = $this->colorOutput($key, $this->colorSuccess);
+            $a = [];
+            $a[] = self::colorOutput($key, self::$colorSuccess);
             $a[] = $val['usage'];
-            $ary[] = $a;
+            $ary_sub[] = $a;
         }
         
-        $str.=  $this->colorOutput("Available commands", $this->colorNotice) . PHP_EOL;
-        $str.= $p->padArray($ary);
+        $str.=  self::colorOutput("Available commands", self::$colorNotice) . PHP_EOL;
+        $str.= $p->padArray($ary_sub);
         echo $str;
     }
     
@@ -125,7 +152,7 @@ class minimalCli {
      * @param string $color
      * @return string $str colored
      */
-    public function colorOutput($str, $color = '') {
+    public static function colorOutput($str, $color = '') {
         $consoleColor = new ConsoleColor();
         return $consoleColor->apply("$color", $str);
     }
@@ -156,7 +183,7 @@ class minimalCli {
      */
     public function getStrLength ($str, $color = false) {
         if ($color) {
-            $str = $this->colorOutput($str, $color);
+            $str = self::colorOutput($str, $color);
         }
         $length = strlen($str);
         return $length;
@@ -177,7 +204,7 @@ class minimalCli {
         }
         $res = $this->validateCommand($command);
         if ($res !== true) {
-            echo $this->colorOutput($res . " is not allowed as option\n", $this->colorError);
+            echo self::colorOutput($res . " is not allowed as option\n", self::$colorError);
             exit(128);
         }
         return $obj->runCommand($this->parse);
@@ -233,7 +260,7 @@ class minimalCli {
         $obj = $this->commands[$command];
         $help = $obj->getHelp();
         
-        $output =  $this->colorOutput("Usage", $this->colorNotice) . PHP_EOL;
+        $output =  $this->colorOutput("Usage", self::$colorNotice) . PHP_EOL;
         $output.= '  ' . $help['usage'] . PHP_EOL . PHP_EOL;
 
         $p = new padding();
@@ -242,11 +269,11 @@ class minimalCli {
         $ary = [];
         foreach($options as $option => $desc) {
             $ary[] = array (
-                $this->colorOutput($option, $this->colorSuccess), $desc
+                $this->colorOutput($option, self::$colorSuccess), $desc
             );
         }
          
-        $output.=  $this->colorOutput("Options:", $this->colorNotice) . PHP_EOL;
+        $output.=  $this->colorOutput("Options:", self::$colorNotice) . PHP_EOL;
         $output.= $p->padArray($ary);
         
         $arguments = $help['arguments'];
@@ -254,11 +281,11 @@ class minimalCli {
         $ary = [];
         foreach($arguments as $argument => $desc) {
             $ary[] = array (
-                $this->colorOutput($argument, $this->colorSuccess), $desc
+                $this->colorOutput($argument, self::$colorSuccess), $desc
             );
         }
         $output.=  PHP_EOL;
-        $output.=  $this->colorOutput("Arguments:", $this->colorNotice) . PHP_EOL;
+        $output.=  $this->colorOutput("Arguments:", self::$colorNotice) . PHP_EOL;
         $output.= $p->padArray($ary);
         
         echo $output;
