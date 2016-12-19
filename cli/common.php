@@ -65,6 +65,19 @@ class common {
      * @return void
      */
     public static function echoStatus($status, $color, $mes) {
+        
+        if ($color == 'y') {
+            $color = minimalCli::$colorNotice;
+        }
+        
+        if ($color == 'g') {
+            $color = minimalCli::$colorSuccess;
+        }
+        
+        if ($color == 'r') {
+            $color = minimalCli::$colorError;
+        }
+        
         if (self::isCli()) {
             echo self::colorOutput(self::getColorStatus("[$status]"), $color);
             echo $mes . "\n";
