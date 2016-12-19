@@ -131,8 +131,6 @@ class minimalCli {
         
         $help_ary = $this->getHelp();
         
-        print_r($help_ary);
-        
         $ary_sub = [];
         foreach($help_ary as $key => $val) {
             $a = [];
