@@ -150,7 +150,21 @@ class minimalCli {
      * @param string $color
      * @return string $str colored
      */
-    public static function colorOutput($str, $color = '') {
+    public static function colorOutput($str, $color) {
+        
+                
+        if ($color == 'y') {
+            $color = minimalCli::$colorNotice;
+        }
+        
+        if ($color == 'g') {
+            $color = minimalCli::$colorSuccess;
+        }
+        
+        if ($color == 'r') {
+            $color = minimalCli::$colorError;
+        }
+        
         $consoleColor = new ConsoleColor();
         return $consoleColor->apply("$color", $str);
     }

@@ -103,11 +103,11 @@ class common {
     /**
      * method for coloring output to command line
      * @param string $output
-     * @param char $color_code (e.g. 'g', 'y', 'r')
+     * @param string $color According to Console colors e.g. green, red, blue
+     *                         A few short codes exixts: ('g', 'y', 'r')
      * @return string $colorered output
      */
-    public static function colorOutput($output, $color = 'g') {
-
+    public static function colorOutput($output, $color) {        
         if (!self::isCli()) {
             return $output;
         }
