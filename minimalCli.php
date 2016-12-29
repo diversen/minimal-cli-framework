@@ -44,7 +44,10 @@ class minimalCli {
      */
     public $header = 'Minmal-cli-framework';
     
-    public function __constract() {}
+    /**
+     * Constructor. Does nothing ... yet
+     */
+    public function __construct() {}
 
     /**
      * Main options that all commands has access to
@@ -61,7 +64,7 @@ class minimalCli {
         
         // Get all commands main options
         $help_ary = $this->getHelp();
-        foreach($help_ary as $key => $val){
+        foreach($help_ary as $val){
             if (isset($val['main_options'])){
                 $main_options['main_options'] = array_merge(
                         $main_options['main_options'], $val['main_options']);
@@ -71,7 +74,7 @@ class minimalCli {
     }
     
     /**
-     * Run the CLI program
+     * Run the main CLI script
      */
     public function runMain() {
         $this->parse = new parseArgv();
@@ -90,7 +93,10 @@ class minimalCli {
 
     }
     
-
+    /**
+     * Get help from a all commands
+     * @return array $help
+     */
     public function getHelp () {
         
         $help = [];
@@ -202,6 +208,20 @@ class minimalCli {
     }
 
     /**
+     * Method to validate command and fill in empty array
+     * @param array $command
+     */
+    private function validateHelp ($command) {
+        if (!isset($command['options'])) {
+            $command['options'] = [];
+        }
+        if (!isset($command['arguments'])){
+            $command['arguments'] = [];
+        }
+        return $command;
+    }
+    
+    /**
      * Execute a command
      * @param string $command
      */
@@ -210,6 +230,7 @@ class minimalCli {
         $obj = $this->commands[$command];
         if (isset($this->parse->flags['help'])) {
             if (method_exists($obj, 'getHelp')) {
+                // $command = $this->prepareCommand($command);
                 $this->executeCommandHelp($command);
                 exit(0);
             }
@@ -251,12 +272,15 @@ class minimalCli {
         // Allow command options
         $command_help = $this->getHelp();
         if (isset($command_help[$command])) {
+            
+            $command_help[$command] = $this->validateHelp($command_help[$command]);            
             $allowed_options = array_merge(
                     $allowed_options, 
                     array_keys($command_help[$command]['options']));
         }
         
         $allowed = [];
+        
         // Clean options from -- and -
         foreach($allowed_options as $option) {
             $allowed[] = preg_replace("/^[-]{1,2}/", '', $option);
@@ -271,55 +295,43 @@ class minimalCli {
     public function executeCommandHelp($command) {
         $obj = $this->commands[$command];
         $help = $obj->getHelp();
+        $help = $this->validateHelp($help);
         
+        // Usage should always be set
         $output =  $this->colorOutput("Usage", self::$colorNotice) . PHP_EOL;
         $output.= '  ' . $help['usage'] . PHP_EOL . PHP_EOL;
 
         $p = new padding();
+        
         $options = $help['options'];
         
+        // Fill array with options and descriptions
         $ary = [];
-        foreach($options as $option => $desc) {
-            $ary[] = array (
-                $this->colorOutput($option, self::$colorSuccess), $desc
-            );
+        if (!empty($options)) {
+            foreach ($options as $option => $desc) {
+                $ary[] = array(
+                    $this->colorOutput($option, self::$colorSuccess), $desc
+                );
+            }
+            $output.=  $this->colorOutput("Options:", self::$colorNotice) . PHP_EOL;
+            $output.= $p->padArray($ary);
         }
-         
-        $output.=  $this->colorOutput("Options:", self::$colorNotice) . PHP_EOL;
-        $output.= $p->padArray($ary);
+
         
+        // Fill array with arguments and descriptions
         $arguments = $help['arguments'];
-        
-        $ary = [];
-        foreach($arguments as $argument => $desc) {
-            $ary[] = array (
-                $this->colorOutput($argument, self::$colorSuccess), $desc
-            );
+        if (!empty($arguments)) {
+            $ary = [];
+            foreach($arguments as $argument => $desc) {
+                $ary[] = array (
+                    $this->colorOutput($argument, self::$colorSuccess), $desc
+                );
+            }
+            $output.=  PHP_EOL;
+            $output.=  $this->colorOutput("Arguments:", self::$colorNotice) . PHP_EOL;
+            $output.= $p->padArray($ary);
         }
-        $output.=  PHP_EOL;
-        $output.=  $this->colorOutput("Arguments:", self::$colorNotice) . PHP_EOL;
-        $output.= $p->padArray($ary);
-        
         echo $output;
 
-    }
-    
-    /**
-     * Get terminal width
-     */
-    public function getTerminalWidth() {
-        return 80;
-    }
-
-    /**
-     * 
-     * @param type $text
-     * @param type $lw
-     * @return type
-     */
-    public function wrap($text) {
-
-        $lw = $this->getTerminalWidth();
-        return wordwrap($text, $lw, "\n", false);
     }
 }
