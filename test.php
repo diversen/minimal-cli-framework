@@ -12,7 +12,7 @@ use diversen\minimalCli;
 class echoTest {
 
     // Return main commands help
-    public function getHelp() {
+    public function getCommand() {
         return 
             array (
                 'usage' => 'Command to make string to upper and lower case',

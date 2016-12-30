@@ -97,8 +97,8 @@ class minimalCli {
 
         $help = [];
         foreach ($this->commands as $key => $command) {
-            if (method_exists($command, 'getHelp')) {
-                $help[$key] = $command->getHelp();
+            if (method_exists($command, 'getCommand')) {
+                $help[$key] = $command->getCommand();
             }
         }
         return $help;
@@ -230,7 +230,7 @@ class minimalCli {
         $this->prepareFlags($allowed_options);
 
         if (isset($this->parse->flags['help'])) {
-            if (method_exists($obj, 'getHelp')) {
+            if (method_exists($obj, 'getCommand')) {
                 $this->executeCommandHelp($command);
                 exit(0);
             }
