@@ -288,7 +288,7 @@ class minimalCli {
         } else if ($c > 1) {
             $str = "Ambiguous shorthand for option given: ";
             $str.= $this->colorOutput($flag, self::$colorError) . $this->NL;
-            $str.= "Possible values are: " . implode(', ', $possible) . $this->NL;
+            $str.= "Possible values are: " . $this->colorOutput(implode(', ', $possible), self::$colorNotice) . $this->NL;
             echo $str;
             exit(128);
         }
