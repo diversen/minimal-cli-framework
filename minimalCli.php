@@ -346,7 +346,7 @@ class minimalCli {
      */
     public function executeCommandHelp($command) {
         $obj = $this->commands[$command];
-        $help = $obj->getHelp();
+        $help = $obj->getCommand();
         $help = $this->validateHelp($help);
 
         // Usage should always be set
