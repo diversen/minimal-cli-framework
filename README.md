@@ -11,14 +11,13 @@ exisiting class you will just need to add two methods: `getHelp` and
 
 # Usage
 
-It consists of two files. A file containing the framework and a file containing some 
-common CLI helpers. 
-
 Example using a single simple command: 
 
 See [test.php](test.php)
 
 # Helpers
+
+Some common CLI helpers. 
 
 See [helpers_test.php](helpers_test.php)
 
