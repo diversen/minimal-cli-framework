@@ -134,51 +134,60 @@ class common {
     }
 
     /**
-     * Function for executing commands with php built-in command system
-     * @param string $command to execute
-     * @return int   $ret the value returned by the shell script being
-     *                 executed through exec()
+     * function for executing commands with php function exec
+     * @param   string  $command to execute
+     * @param   boolean $status_message display status message of exec command or not
+     * @param   boolean $output echo output of command or not
+     * @return  int     $ret the value returned by the shell script being
+     *                  executed through exec()
      */
-    public static function systemCommand($command) {
-        system($command . ' 2>&1', $ret);
+    public static function execCommand($command, $status_message = 1, $output = 1) {
+        $shell_output = array();
+        exec($command . ' 2>&1', $shell_output, $ret);
         if ($ret == 0) {
-            echo self::colorOutput(self::getColorStatus('[OK]'), minimalCli::$colorSuccess);
-            echo $command . PHP_EOL;
+            if ($status_message) {
+                echo self::colorOutput(self::getColorStatus('[OK]'), minimalCli::$colorSuccess);
+                echo $command . PHP_EOL;
+                
+            }
         } else {
-            echo self::colorOutput(self::getColorStatus('[ERROR]'), minimalCli::$colorError);
-            echo $command . PHP_EOL;
+            if ($status_message) {
+                echo self::colorOutput(self::getColorStatus('[ERROR]'), minimalCli::$colorError);
+                echo $command . PHP_EOL;
+            }
         }
+        
+        if ($output) {
+            echo self::parseShellArray($shell_output);
+        }
+
         return $ret;
     }
     
     /**
-     * function for executing commands with php command exec
+     * function for executing commands with php function system
+     * this will always output the commands messages and errors
      * @param   string  $command to execute
-     * @param   array   $options defaults to:
-     *                  array ('silence' => false);
-     * @return  mixed   $ret the value returned by the shell script being
+     * @param   boolean $status_message display status message of exec command or not
+     * @return  int     $ret the value returned by the shell script being
      *                  executed through exec()
      */
-    public static function execCommand($command, $options = array(), $echo_output = 1) {
-        $output = array();
-        exec($command . ' 2>&1', $output, $ret);
+    public static function systemCommand($command, $status_message = 1) {
+        $shell_output = array();
+        system($command . ' 2>&1', $ret);
         if ($ret == 0) {
-            if (!isset($options['silence'])) {
+            if ($status_message) {
                 echo self::colorOutput(self::getColorStatus('[OK]'), minimalCli::$colorSuccess);
                 echo $command . PHP_EOL;
-                if ($echo_output) {
-                    echo self::parseShellArray($output);
-                }
+                
             }
         } else {
-            if (!isset($options['silence'])) {
+            if ($status_message) {
                 echo self::colorOutput(self::getColorStatus('[ERROR]'), minimalCli::$colorError);
                 echo $command . PHP_EOL;
-                if ($echo_output) {
-                    echo self::parseShellArray($output);
-                }
             }
         }
+
         return $ret;
     }
 

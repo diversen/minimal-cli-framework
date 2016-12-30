@@ -6,7 +6,7 @@ include_once "minimalCli.php";
 
 use diversen\minimalCli;
 
-class echoTest extends minimalCli {
+class echoTest {
 
     // Return main commands help
     public function getHelp() {
