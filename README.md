@@ -20,7 +20,7 @@ See [test.php](test.php)
 
 # Helpers
 
-See [test_helpers.php](test_helpers.php)
+See [helpers_test.php](helpers_test.php)
 
 Colors are supported with [https://github.com/JakubOnderka/PHP-Console-Color](https://github.com/JakubOnderka/PHP-Console-Color)
 
