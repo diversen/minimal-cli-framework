@@ -157,15 +157,15 @@ class minimalCli {
 
 
         if ($color == 'y') {
-            $color = minimalCli::$colorNotice;
+            $color = self::$colorNotice;
         }
 
         if ($color == 'g') {
-            $color = minimalCli::$colorSuccess;
+            $color = self::$colorSuccess;
         }
 
         if ($color == 'r') {
-            $color = minimalCli::$colorError;
+            $color = self::$colorError;
         }
 
         $consoleColor = new ConsoleColor();
