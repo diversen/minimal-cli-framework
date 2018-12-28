@@ -266,6 +266,10 @@ class minimalCli {
         $set_option = '';
         $possible = [];
         foreach ($allowed_options as $key => $option) {
+
+            if (empty(trim($flag))) {
+                continue;
+            }
             
             // Fine exact match
             if ($option == $flag) {
@@ -351,7 +355,7 @@ class minimalCli {
 
         // Usage should always be set
         $output = $this->colorOutput("Usage", self::$colorNotice) . $this->NL;
-        $output .= '  ' . $help['usage'] . $this->NL . $this->NL;
+        $output .= '  ' . $help['usage'] . $this->NL;
 
         $p = new padding();
 
@@ -360,11 +364,13 @@ class minimalCli {
         // Fill array with options and descriptions
         $ary = [];
         if (!empty($options)) {
+            $output .= $this->NL;
             foreach ($options as $option => $desc) {
                 $ary[] = array(
                     $this->colorOutput($option, self::$colorSuccess), $desc
                 );
             }
+            
             $output .= $this->colorOutput("Options:", self::$colorNotice) . $this->NL;
             $output .= $p->padArray($ary);
         }
