@@ -1,6 +1,6 @@
 # minimal-cli-framework
 
-A very simple CLI framework with options for muliple sub-commands
+A simple CLI framework with options for muliple sub-commands
 loaded as classes. In order to implement a command into an
 exisiting class you will just need to add two methods: `getCommand` and
 `runCommand` - and then add a class object to the framework.
@@ -13,7 +13,17 @@ exisiting class you will just need to add two methods: `getCommand` and
 
 Example using a single simple command: 
 
-See [test.php](test.php)
+See [test.php](test.php) which has a single command (`echo`):
+
+In to get help on the command `echo`
+
+    php test.php echo --help
+
+Usage could then be: 
+
+    php test.php echo --strtoupper README.md
+
+Which will output the file in uppercase
 
 # Helpers
 

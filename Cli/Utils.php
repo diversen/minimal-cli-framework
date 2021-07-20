@@ -1,20 +1,22 @@
 <?php
 
-namespace diversen\cli;
+namespace diversen\Cli;
 
-use diversen\minimalCli;
+use diversen\MinimalCli;
 
 /**
  * common helper function in CLI env.
  */
-class common {
+class Utils extends MinimalCli
+{
 
     /**
      * checks is a user is root
      * @return boolean $res true if yes else no
      */
-    public static function isRoot() {
-        if (!function_exists('posix_getuid')){
+    public function isRoot()
+    {
+        if (!function_exists('posix_getuid')) {
             return true;
         }
         if (0 == posix_getuid()) {
@@ -24,114 +26,94 @@ class common {
         }
     }
 
-
     /**
      * examine if user is root. If not exit, and echo a message
      * @param string $str
-     * @return int 0 on success else a positive int. 
+     * @return int 0 on success else a positive int.
      */
-    public static function needRoot($str = '') {
+    public function needRoot(string $str = '')
+    {
 
         $output = '';
-        $output.= "Current command needs to be run as root. E.g. with sudo: ";
+        $output .= "Current command needs to be run as root. E.g. with sudo: ";
         if (!empty($str)) {
-            $output.="\nsudo $str";
+            $output .= "\nsudo $str";
         }
 
-        if (!self::isRoot()) {
+        if (!$this->isRoot()) {
             echo $output . PHP_EOL;
             exit(128);
         }
         return 0;
     }
-    
+
     /**
      * checks if we are in cli env
      * @return boolean $res true if we are and false
      */
-    public static function isCli () {
-        if (isset($_SERVER['SERVER_NAME'])){
+    public function isCli(): bool
+    {
+        if (isset($_SERVER['SERVER_NAME'])) {
             return false;
         }
         return true;
     }
 
     /**
-     * echos a colored status message
-     * @param string $status (e.g. UPGRADE, NOTICE, ERROR)
-     * @param char $color the color to print, e.g. 'y', 'r', 'g'
-     * @param string $mes the long status message to be appended to e.g. 
-     *               'module upgrade failed'
-     * @return void
+     * echo a colored status message
      */
-    public static function echoStatus($status, $color, $mes) {
-        
+    public function echoStatus(string $status, string $color, string $mes)
+    {
+
         if ($color == 'y') {
-            $color = minimalCli::$colorNotice;
+            $color = $this->colorNotice;
         }
-        
+
         if ($color == 'g') {
-            $color = minimalCli::$colorSuccess;
+            $color = $this->colorSuccess;
         }
-        
+
         if ($color == 'r') {
-            $color = minimalCli::$colorError;
+            $color = $this->colorError;
         }
-        
-        if (self::isCli()) {
-            echo self::colorOutput(self::getColorStatus("[$status]"), $color);
+
+        if ($this->isCli()) {
+            echo $this->colorOutput($this->getColorStatus("[$status]"), $color);
             echo $mes . "\n";
         } else {
-            self::echoMessage($status);
+            $this->echoMessage($status);
         }
         return;
     }
 
     /**
      * calculate and gets correct length of a status message,
-     * e.g. [OK] and [NOTICE]
-     * @param string $status [OK]
-     * @return string $status
      */
-    private static function getColorStatus($status) {
+    private function getColorStatus(string $status)
+    {
         $len = strlen($status);
         $add_spaces = 12 - $len;
-        $status.=str_repeat(' ', $add_spaces);
+        $status .= str_repeat(' ', $add_spaces);
         return $status;
     }
 
     /**
-     * method for coloring output to command line
-     * @param string $output
-     * @param string $color According to Console colors e.g. green, red, blue
-     *                         A few short codes exixts: ('g', 'y', 'r')
-     * @return string $colorered output
+     * method for printing a message
      */
-    public static function colorOutput($output, $color) {        
-        if (!self::isCli()) {
-            return $output;
-        }
-        
-        return minimalCli::colorOutput($output, $color);
-    }
-
-    /**
-     * simple function for printing a message
-     * @param  string $mes the message to echo
-     * @param  string $color Add a color to the output
-     */
-    public static function echoMessage($mes, $color = null) {
+    public function echoMessage($mes, $color = null)
+    {
         if ($color) {
-            echo self::colorOutput($mes . PHP_EOL, $color);
+            echo $this->colorOutput($mes . PHP_EOL, $color);
             return;
         }
-        if (self::isCli()) {
+        if ($this->isCli()) {
             echo $mes . PHP_EOL;
         } else {
             echo $mes . "<br />\n";
         }
         return;
     }
+
 
     /**
      * function for executing commands with php function exec
@@ -141,29 +123,30 @@ class common {
      * @return  int     $ret the value returned by the shell script being
      *                  executed through exec()
      */
-    public static function execCommand($command, $status_message = 1, $output = 1) {
+    public function execCommand(string $command, $status_message = 1, $output = 1)
+    {
         $shell_output = array();
         exec($command . ' 2>&1', $shell_output, $ret);
         if ($ret == 0) {
             if ($status_message) {
-                echo self::colorOutput(self::getColorStatus('[OK]'), minimalCli::$colorSuccess);
+                echo $this->colorOutput($this->getColorStatus('[OK]'), $this->colorSuccess);
                 echo $command . PHP_EOL;
-                
+
             }
         } else {
             if ($status_message) {
-                echo self::colorOutput(self::getColorStatus('[ERROR]'), minimalCli::$colorError);
+                echo $this->colorOutput($this->getColorStatus('[ERROR]'), $this->colorError);
                 echo $command . PHP_EOL;
             }
         }
-        
+
         if ($output) {
-            echo self::parseShellArray($shell_output);
+            echo $this->parseShellArray($shell_output);
         }
 
         return $ret;
     }
-    
+
     /**
      * function for executing commands with php function system
      * this will always output the commands messages and errors
@@ -172,18 +155,19 @@ class common {
      * @return  int     $ret the value returned by the shell script being
      *                  executed through exec()
      */
-    public static function systemCommand($command, $status_message = 1) {
-        $shell_output = array();
+    public function systemCommand($command, $status_message = 1)
+    {
+
         system($command . ' 2>&1', $ret);
         if ($ret == 0) {
             if ($status_message) {
-                echo self::colorOutput(self::getColorStatus('[OK]'), minimalCli::$colorSuccess);
+                echo $this->colorOutput($this->getColorStatus('[OK]'), $this->colorSuccess);
                 echo $command . PHP_EOL;
-                
+
             }
         } else {
             if ($status_message) {
-                echo self::colorOutput(self::getColorStatus('[ERROR]'), minimalCli::$colorError);
+                echo $this->colorOutput($this->getColorStatus('[ERROR]'), $this->colorError);
                 echo $command . PHP_EOL;
             }
         }
@@ -196,69 +180,70 @@ class common {
      * @param array $output
      * @return string $str
      */
-    public static function parseShellArray($output) {
+    public function parseShellArray($output)
+    {
         if (!is_array($output)) {
             return '';
         }
         $end_output = '';
         foreach ($output as $val) {
-            $end_output.= $val . PHP_EOL;
+            $end_output .= $val . PHP_EOL;
         }
         return $end_output;
     }
-    
+
     /**
      * a function for getting a confirm from command prompt
      * @param string $line a line to inform user what is going to happen
      * @param mixed $silence. If set we answer 'y' to all confirm readlines
      * @return int 1 on 'y' or 'Y' and 0 on anything else.
      */
-    public static function readlineConfirm($line = null, $set_silence = null) {
-        static $silence = null;
-        if (isset($set_silence)) {
-            $silence = 1;
-        }
-        if ($silence == 1) {
+    public function readlineConfirm($line = null, $set_silence = null)
+    {
+
+        if ($set_silence == 1) {
             return 1;
         }
         $str = $line;
-        $str.= " Sure you want to continue? [Y/n]";
-        $res = self::readSingleline($str);
+        $str .= " Sure you want to continue? [Y/n]";
+        $res = $this->readSingleline($str);
         if (strtolower($res) == 'y') {
             return 1;
         } else {
             return 0;
         }
     }
-    
+
     /**
      * command for aborting a script and printing info about abort
      * @param   string  $str string to be printed on abort
      * @return  int     $res  16
      */
-    public static function abort($str = null) {
+    public function abort($str = null)
+    {
         if (isset($str)) {
             $str = $str . "\nAborting!";
         } else {
             $str = "Aborting!";
         }
-        self::echoMessage(self::colorOutput($str, minimalCli::$colorError));
+        $this->echoMessage($this->colorOutput($str, $this->colorError));
         exit(16);
     }
-    
+
     /**
      * Read a single line from stdin
      *
      * @param string $str the str to print to screen
      * @return string $out the input which readline reads
      */
-    public static function readSingleline($str) {
+    public function readSingleline($str)
+    {
         echo $str;
         $out = "";
         $key = "";
-        $key = fgetc(STDIN);      // read from standard input (keyboard)
-        while ($key != "\n") {      // if the newline character has not yet arrived read another
-            $out.= $key;
+        $key = fgetc(STDIN); // read from standard input (keyboard)
+        while ($key != "\n") { // if the newline character has not yet arrived read another
+            $out .= $key;
             $key = fread(STDIN, 1);
         }
         return $out;

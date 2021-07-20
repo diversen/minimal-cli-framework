@@ -1,7 +1,9 @@
 <?php
 
-include_once "../../../vendor/autoload.php";
-$consoleColor = new JakubOnderka\PhpConsoleColor\ConsoleColor();
+include_once "vendor/autoload.php";
+use PHP_Parallel_Lint\PhpConsoleColor\ConsoleColor;
+
+$consoleColor = new ConsoleColor();
 echo "Colors are supported: " . ($consoleColor->isSupported() ? 'Yes' : 'No') . "\n";
 echo "256 colors are supported: " . ($consoleColor->are256ColorsSupported() ? 'Yes' : 'No') . "\n\n";
 if ($consoleColor->isSupported()) {

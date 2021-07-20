@@ -2,15 +2,16 @@
 
 namespace diversen;
 
-use JakubOnderka\PhpConsoleColor\ConsoleColor;
-use diversen\parseArgv;
 use diversen\padding;
+use diversen\parseArgv;
+use PHP_Parallel_Lint\PhpConsoleColor\ConsoleColor;
 
-class minimalCli {
+class MinimalCli
+{
 
     /**
      * Array holding command objects
-     * @var array $commands 
+     * @var array $commands
      */
     public $commands = [];
 
@@ -22,41 +23,38 @@ class minimalCli {
 
     /**
      * Color of success
-     * @var string $colorSuccess
      */
-    public static $colorSuccess = 'green';
+    public $colorSuccess = 'green';
 
     /**
      * Color of notice
-     * @var string $colorNotice
      */
-    public static $colorNotice = 'yellow';
+    public $colorNotice = 'yellow';
 
     /**
      * Color of error
-     * @var string $colorError
      */
-    public static $colorError = 'red';
+    public $colorError = 'red';
 
     /**
-     * Set a header notice 
-     * @var string $header
+     * Set a header notice
      */
-    public $header = 'Minmal-cli-framework';
-    
+    public $header = 'Minimal-cli-framework';
+
     private $NL = "\n";
 
     /**
      * Get main options that all commands has access to.
      * @return array $main_options
      */
-    private function getHelpMain() {
+    private function getHelpMain()
+    {
 
         // Built-in main options
         $main_options = array(
             'main_options' => array(
                 '--help' => 'Will output help. Specify command followed by --help to get specific help on a command',
-                '--verbose' => 'verbose output')
+                '--verbose' => 'verbose output'),
         );
 
         // Get all commands main options
@@ -64,24 +62,27 @@ class minimalCli {
         foreach ($help_ary as $val) {
             if (isset($val['main_options'])) {
                 $main_options['main_options'] = array_merge(
-                        $main_options['main_options'], $val['main_options']);
+                    $main_options['main_options'], $val['main_options']);
             }
         }
+
         return $main_options;
     }
 
     /**
      * Run the main CLI script
      */
-    public function runMain() {
+    public function runMain()
+    {
         $this->parse = new parseArgv();
 
         // Look for command
-        foreach ($this->commands as $key => $command) {
+        $keys = array_keys($this->commands);
+        foreach ($keys as $command) {
 
-            if ($this->parse->getValue($key)) {
-                $this->parse->unsetValue($key);
-                $res = $this->execute($key);
+            if ($this->parse->getValue($command)) {
+                $this->parse->unsetValue($command);
+                $res = $this->execute($command);
                 exit($res);
             }
         }
@@ -93,7 +94,8 @@ class minimalCli {
      * Get help from a all commands
      * @return array $help
      */
-    public function getHelp() {
+    private function getHelp()
+    {
 
         $help = [];
         foreach ($this->commands as $key => $command) {
@@ -107,9 +109,11 @@ class minimalCli {
     /**
      * Displays help text
      */
-    public function executeMainHelp() {
+    private function executeMainHelp()
+    {
 
         global $argv;
+        
         $str = $this->header . $this->NL . $this->NL;
 
         $p = new padding();
@@ -117,19 +121,19 @@ class minimalCli {
         $help_main = $this->getHelpMain();
 
         // Usage
-        $str.= self::colorOutput('Usage', self::$colorNotice) . $this->NL;
-        $str.= '  ' . self::colorOutput($argv[0], self::$colorSuccess) . ' [--options] [command] [--options] [arguments]';
-        $str.= $this->NL . $this->NL;
-        
+        $str .= $this->colorOutput('Usage', $this->colorNotice) . $this->NL;
+        $str .= '  ' . $this->colorOutput($argv[0], $this->colorSuccess) . ' [--options] [command] [--options] [arguments]';
+        $str .= $this->NL . $this->NL;
+
         $main_options = $help_main['main_options'];
         $ary_main = [];
         foreach ($main_options as $option => $desc) {
             $ary_main[] = array(
-                self::colorOutput($option, self::$colorSuccess), $desc
+                $this->colorOutput($option, $this->colorSuccess), $desc,
             );
         }
 
-        $str .= self::colorOutput('Options across all commands', self::$colorNotice) . $this->NL;
+        $str .= $this->colorOutput('Options across all commands', $this->colorNotice) . $this->NL;
         $str .= $p->padArray($ary_main) . $this->NL;
 
         $help_ary = $this->getHelp();
@@ -137,12 +141,12 @@ class minimalCli {
         $ary_sub = [];
         foreach ($help_ary as $key => $val) {
             $a = [];
-            $a[] = self::colorOutput($key, self::$colorSuccess);
+            $a[] = $this->colorOutput($key, $this->colorSuccess);
             $a[] = $val['usage'];
             $ary_sub[] = $a;
         }
 
-        $str .= self::colorOutput("Available commands", self::$colorNotice) . $this->NL;
+        $str .= $this->colorOutput("Available commands", $this->colorNotice) . $this->NL;
         $str .= $p->padArray($ary_sub);
         echo $str;
     }
@@ -153,62 +157,37 @@ class minimalCli {
      * @param string $color
      * @return string $str colored
      */
-    public static function colorOutput($str, $color) {
-
+    public function colorOutput($str, $color = 'y')
+    {
 
         if ($color == 'y') {
-            $color = self::$colorNotice;
+            $color = $this->colorNotice;
         }
 
         if ($color == 'g') {
-            $color = self::$colorSuccess;
+            $color = $this->colorSuccess;
         }
 
         if ($color == 'r') {
-            $color = self::$colorError;
+            $color = $this->colorError;
         }
 
         $consoleColor = new ConsoleColor();
-        return $consoleColor->apply("$color", $str);
-    }
-
-    /**
-     * Get max length of help in order to know
-     * how wide to pad a string
-     * @param array $helps
-     * @return int $width
-     */
-    public function getStrMaxLength($helps, $color = false) {
-
-        $max_length = 0;
-        foreach ($helps as $key => $help) {
-            $length = $this->getStrLength($key, $color);
-            if ($length > $max_length) {
-                $max_length = $length;
-            }
+        if ($consoleColor->isSupported()) {
+            return $consoleColor->apply("$color", $str);
         }
-        return $max_length;
+        return $str;
+
     }
 
-    /**
-     * Get string length
-     * @param string $str
-     * @param string $color
-     * @return int $length
-     */
-    public function getStrLength($str, $color = false) {
-        if ($color) {
-            $str = self::colorOutput($str, $color);
-        }
-        $length = strlen($str);
-        return $length;
-    }
+
 
     /**
      * Method to validate command and fill in empty array
      * @param array $command
      */
-    private function validateHelp($command) {
+    private function validateHelp($command)
+    {
         if (!isset($command['options'])) {
             $command['options'] = [];
         }
@@ -222,7 +201,8 @@ class minimalCli {
      * Execute a command
      * @param string $command
      */
-    public function execute($command) {
+    public function execute($command)
+    {
 
         $obj = $this->commands[$command];
 
@@ -238,7 +218,7 @@ class minimalCli {
 
         $res = $this->validateCommand($command);
         if ($res !== true) {
-            echo self::colorOutput($res . " is not allowed as option\n", self::$colorError);
+            echo $this->colorOutput($res . " is not allowed as option\n", $this->colorError);
             exit(128);
         }
 
@@ -251,16 +231,17 @@ class minimalCli {
      * If a command is ambiguous exit on display message
      * @param array $allow
      */
-    private function prepareFlags($allowed_options) {
-        
+    private function prepareFlags($allowed_options)
+    {
+
         foreach ($this->parse->flags as $flag => $key) {
             $this->checkShorthand($allowed_options, $flag);
-                
-            
+
         }
     }
 
-    private function checkShorthand($allowed_options, $flag) {
+    private function checkShorthand($allowed_options, $flag)
+    {
 
         $c = 0;
         $set_option = '';
@@ -270,14 +251,14 @@ class minimalCli {
             if (empty(trim($flag))) {
                 continue;
             }
-            
+
             // Fine exact match
             if ($option == $flag) {
                 return;
             }
-            
+
             // Match between option and a flag
-            if ( strpos($option, $flag) === 0) {
+            if (strpos($option, $flag) === 0) {
                 $possible[] = $option;
                 $set_option = $option;
                 $c++;
@@ -291,8 +272,8 @@ class minimalCli {
             return true;
         } else if ($c > 1) {
             $str = "Ambiguous shorthand for option given: ";
-            $str.= $this->colorOutput($flag, self::$colorError) . $this->NL;
-            $str.= "Possible values are: " . $this->colorOutput(implode(', ', $possible), self::$colorNotice) . $this->NL;
+            $str .= $this->colorOutput($flag, $this->colorError) . $this->NL;
+            $str .= "Possible values are: " . $this->colorOutput(implode(', ', $possible), $this->colorNotice) . $this->NL;
             echo $str;
             exit(128);
         }
@@ -303,7 +284,8 @@ class minimalCli {
      * @param string $command
      * @return mixed true if command is OK else the command as str
      */
-    private function validateCommand($command) {
+    private function validateCommand($command)
+    {
         $allowed = $this->getAllowedOptions($command);
         // $this->prepareFlags($allowed);
 
@@ -320,7 +302,8 @@ class minimalCli {
      * @param string $command
      * @return array $allowed
      */
-    public function getAllowedOptions($command) {
+    public function getAllowedOptions($command)
+    {
 
         // Allowed main options
         $main = $this->getHelpMain();
@@ -332,7 +315,7 @@ class minimalCli {
 
             $command_help[$command] = $this->validateHelp($command_help[$command]);
             $allowed_options = array_merge(
-                    $allowed_options, array_keys($command_help[$command]['options']));
+                $allowed_options, array_keys($command_help[$command]['options']));
         }
 
         $allowed = [];
@@ -348,13 +331,14 @@ class minimalCli {
      * Execute specified command help
      * @param string $command
      */
-    public function executeCommandHelp($command) {
+    public function executeCommandHelp($command)
+    {
         $obj = $this->commands[$command];
         $help = $obj->getCommand();
         $help = $this->validateHelp($help);
 
         // Usage should always be set
-        $output = $this->colorOutput("Usage", self::$colorNotice) . $this->NL;
+        $output = $this->colorOutput("Usage", $this->colorNotice) . $this->NL;
         $output .= '  ' . $help['usage'] . $this->NL;
 
         $p = new padding();
@@ -367,14 +351,13 @@ class minimalCli {
             $output .= $this->NL;
             foreach ($options as $option => $desc) {
                 $ary[] = array(
-                    $this->colorOutput($option, self::$colorSuccess), $desc
+                    $this->colorOutput($option, $this->colorSuccess), $desc,
                 );
             }
-            
-            $output .= $this->colorOutput("Options:", self::$colorNotice) . $this->NL;
+
+            $output .= $this->colorOutput("Options:", $this->colorNotice) . $this->NL;
             $output .= $p->padArray($ary);
         }
-
 
         // Fill array with arguments and descriptions
         $arguments = $help['arguments'];
@@ -382,11 +365,11 @@ class minimalCli {
             $ary = [];
             foreach ($arguments as $argument => $desc) {
                 $ary[] = array(
-                    $this->colorOutput($argument, self::$colorSuccess), $desc
+                    $this->colorOutput($argument, $this->colorSuccess), $desc,
                 );
             }
             $output .= $this->NL;
-            $output .= $this->colorOutput("Arguments:", self::$colorNotice) . $this->NL;
+            $output .= $this->colorOutput("Arguments:", $this->colorNotice) . $this->NL;
             $output .= $p->padArray($ary);
         }
         echo $output;

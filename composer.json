@@ -10,9 +10,9 @@
         }
     ],
     "require": {
-        "jakub-onderka/php-console-color": "^0.1.0",
         "diversen/console-padding": "^1.0",
-        "diversen/parse-argv": "^1.2"
+        "diversen/parse-argv": "^1.2",
+        "php-parallel-lint/php-console-color": "^1.0"
     },
     "autoload": {
         "psr-4": {

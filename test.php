@@ -7,7 +7,7 @@ include_once "vendor/autoload.php";
 // with the above include. This is just to make it easy to test.
 include_once "minimalCli.php";
 
-use diversen\minimalCli;
+use diversen\MinimalCli;
 
 class echoTest {
 
@@ -73,7 +73,7 @@ EOF;
 
 $echo = new echoTest();
 $commands['echo'] = $echo;
-$m = new minimalCli();
+$m = new MinimalCli();
 $m->commands = $commands;
 $m->header = $header;
 $m->runMain();
