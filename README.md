@@ -29,8 +29,8 @@ Which will output the file in uppercase
 
 Some common CLI helpers. 
 
-See [helpers_test.php](helpers_test.php)
+See [utils_test.php](utils_test.php)
 
-Colors are supported with [https://github.com/JakubOnderka/PHP-Console-Color](https://github.com/JakubOnderka/PHP-Console-Color)
+Colors are supported with [https://github.com/php-parallel-lint/PHP-Console-Color](https://github.com/php-parallel-lint/PHP-Console-Color)
 
 License: MIT
