@@ -5,7 +5,7 @@ include_once "vendor/autoload.php";
 
 // You will not need the following include if you are autoloading 
 // with the above include. This is just to make it easy to test.
-include_once "minimalCli.php";
+include_once "MinimalCli.php";
 
 use diversen\MinimalCli;
 
