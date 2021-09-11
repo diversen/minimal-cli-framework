@@ -3,7 +3,7 @@
 namespace diversen;
 
 use diversen\padding;
-use diversen\ParseArgv;
+use Diversen\ParseArgv;
 use PHP_Parallel_Lint\PhpConsoleColor\ConsoleColor;
 
 class MinimalCli
@@ -17,7 +17,7 @@ class MinimalCli
 
     /**
      *
-     * @var \diversen\parseArgv
+     * @var \Diversen\parseArgv
      */
     public $parse = null;
 
