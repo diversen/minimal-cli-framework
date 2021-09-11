@@ -11,17 +11,12 @@
     ],
     "require": {
         "diversen/console-padding": "^1.0",
-        "diversen/parse-argv": "^1.2",
         "php-parallel-lint/php-console-color": "^1.0"
     },
     "autoload": {
         "psr-4": {
             "diversen\\": ""
         }
-    },
-    "extra": {
-        "branch-alias": {
-            "dev-master": "1.0-dev"
-        }
     }
+
 }

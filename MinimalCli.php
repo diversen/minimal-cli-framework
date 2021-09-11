@@ -3,7 +3,7 @@
 namespace diversen;
 
 use diversen\padding;
-use diversen\parseArgv;
+use diversen\ParseArgv;
 use PHP_Parallel_Lint\PhpConsoleColor\ConsoleColor;
 
 class MinimalCli
@@ -41,6 +41,9 @@ class MinimalCli
      */
     public $header = 'Minimal-cli-framework';
 
+    /**
+     * Newline definition
+     */
     private $NL = "\n";
 
     /**
@@ -74,10 +77,9 @@ class MinimalCli
      */
     public function runMain()
     {
-        $this->parse = new parseArgv();
-
-        // Look for command
+        $this->parse = new ParseArgv();
         $keys = array_keys($this->commands);
+
         foreach ($keys as $command) {
 
             if ($this->parse->getValue($command)) {
@@ -92,7 +94,6 @@ class MinimalCli
 
     /**
      * Get help from a all commands
-     * @return array $help
      */
     private function getHelp()
     {
@@ -206,9 +207,6 @@ class MinimalCli
 
         $obj = $this->commands[$command];
 
-        $allowed_options = $this->getAllowedOptions($command);
-        $this->prepareFlags($allowed_options);
-
         if (isset($this->parse->flags['help'])) {
             if (method_exists($obj, 'getCommand')) {
                 $this->executeCommandHelp($command);
@@ -225,59 +223,7 @@ class MinimalCli
         return $obj->runCommand($this->parse);
     }
 
-    /**
-     * Checks if an option can be a short form of a defined option.
-     * e.g. --save could be --save-file
-     * If a command is ambiguous exit on display message
-     * @param array $allow
-     */
-    private function prepareFlags($allowed_options)
-    {
 
-        foreach ($this->parse->flags as $flag => $key) {
-            $this->checkShorthand($allowed_options, $flag);
-
-        }
-    }
-
-    private function checkShorthand($allowed_options, $flag)
-    {
-
-        $c = 0;
-        $set_option = '';
-        $possible = [];
-        foreach ($allowed_options as $key => $option) {
-
-            if (empty(trim($flag))) {
-                continue;
-            }
-
-            // Fine exact match
-            if ($option == $flag) {
-                return;
-            }
-
-            // Match between option and a flag
-            if (strpos($option, $flag) === 0) {
-                $possible[] = $option;
-                $set_option = $option;
-                $c++;
-            }
-        }
-
-        if ($c === 1) {
-            $value = $this->parse->getFlag($flag);
-            $this->parse->flags[$set_option] = $value;
-            unset($this->parse->flags[$flag]);
-            return true;
-        } else if ($c > 1) {
-            $str = "Ambiguous shorthand for option given: ";
-            $str .= $this->colorOutput($flag, $this->colorError) . $this->NL;
-            $str .= "Possible values are: " . $this->colorOutput(implode(', ', $possible), $this->colorNotice) . $this->NL;
-            echo $str;
-            exit(128);
-        }
-    }
 
     /**
      * Validate a command
@@ -287,7 +233,6 @@ class MinimalCli
     private function validateCommand($command)
     {
         $allowed = $this->getAllowedOptions($command);
-        // $this->prepareFlags($allowed);
 
         foreach ($this->parse->flags as $key => $flag) {
             if (!in_array($key, $allowed)) {
