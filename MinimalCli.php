@@ -207,6 +207,9 @@ class MinimalCli
 
         $obj = $this->commands[$command];
 
+        $allowed_options = $this->getAllowedOptions($command);
+        $this->prepareFlags($allowed_options);
+
         if (isset($this->parse->flags['help'])) {
             if (method_exists($obj, 'getCommand')) {
                 $this->executeCommandHelp($command);
@@ -221,6 +224,54 @@ class MinimalCli
         }
 
         return $obj->runCommand($this->parse);
+    }
+
+    private function prepareFlags($allowed_options)
+    {
+
+        foreach ($this->parse->flags as $flag => $key) {
+            $this->checkShorthand($allowed_options, $flag);
+
+        }
+    }
+
+    private function checkShorthand($allowed_options, $flag)
+    {
+
+        $c = 0;
+        $set_option = '';
+        $possible = [];
+        foreach ($allowed_options as $key => $option) {
+
+            if (empty(trim($flag))) {
+                continue;
+            }
+
+            // Fine exact match
+            if ($option == $flag) {
+                return;
+            }
+
+            // Match between option and a flag
+            if (strpos($option, $flag) === 0) {
+                $possible[] = $option;
+                $set_option = $option;
+                $c++;
+            }
+        }
+
+        if ($c === 1) {
+            $value = $this->parse->getFlag($flag);
+            $this->parse->flags[$set_option] = $value;
+            unset($this->parse->flags[$flag]);
+            return true;
+        } else if ($c > 1) {
+            $str = "Ambiguous shorthand for option given: ";
+            $str .= $this->colorOutput($flag, $this->colorError) . $this->NL;
+            $str .= "Possible values are: " . $this->colorOutput(implode(', ', $possible), $this->colorNotice) . $this->NL;
+            echo $str;
+            exit(128);
+        }
     }
 
 
