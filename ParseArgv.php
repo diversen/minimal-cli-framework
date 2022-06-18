@@ -98,6 +98,10 @@ class ParseArgv {
             return $this->flags[$key];
         }
     }
+
+    public function getOption($option) {
+        return $this->getFlag($option);
+    }
     
     /**
      * Return a value by key
@@ -115,6 +119,15 @@ class ParseArgv {
         if (isset($this->valuesByKey[$key])) {
             return $this->valuesByKey[$key];
         }
+    }
+
+    /**
+     * Get argument
+     * E.g. getArgument(0) will get the first argument
+     * getArgument(1) will get the second argument
+     */
+    public function getArgument($index) {
+        return $this->getValueByKey($index);
     }
     
     /**
