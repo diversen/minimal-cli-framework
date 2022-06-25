@@ -3,7 +3,7 @@
 A simple CLI framework with options for muliple sub-commands
 loaded as classes. In order to implement a command into an
 exisiting class you will just need to add two methods: `getCommand` and
-`runCommand` - and then add a class object to the framework.
+`runCommand` - and then add an object to the framework.
 
 # Install:
 
