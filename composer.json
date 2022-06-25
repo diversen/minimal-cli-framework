@@ -10,7 +10,7 @@
         }
     ],
     "require": {
-        "diversen/console-padding": "^1.0",
+        "diversen/console-padding": "^2.0",
         "php-parallel-lint/php-console-color": "^1.0"
     },
     "autoload": {

@@ -1,8 +1,8 @@
 <?php
 
-namespace diversen;
+namespace Diversen;
 
-use diversen\padding;
+use Diversen\Padding;
 use Diversen\ParseArgv;
 use PHP_Parallel_Lint\PhpConsoleColor\ConsoleColor;
 
