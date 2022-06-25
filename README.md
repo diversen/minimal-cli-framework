@@ -17,11 +17,11 @@ See [test/test.php](test/test.php) which has a single command (`echo`):
 
 In to get help on the command `echo`
 
-    php test.php echo --help
+    php test/test.php echo --help
 
 Usage could then be: 
 
-    php test.php echo --strtoupper README.md
+    php test/test.php echo --strtoupper README.md
 
 Which will output the file in uppercase
 
