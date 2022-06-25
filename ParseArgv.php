@@ -3,29 +3,21 @@
 namespace Diversen;
 
 /**
- * Parse argv and get '-' and '--' flags and values, and get any value without a flag.
+ * Parse argv and return an array with the options and arguments.
  */
 class ParseArgv {
     
-        
-    
     /**
-     * var holding $flags as key => value 
+     * var holding $options as key => value 
      * @var array 
      */
-    public $flags = array ();
+    public $options = array ();
     
     /**
-     * var holding any values without flags
+     * var holding any arguments without options
      * @var array 
      */
-    public $values = array ();
-    
-    /**
-     * var holding any values without flags by key numbers
-     * @var array 
-     */
-    public $valuesByKey = array ();
+    public $arguments = array ();
     
     /**
      * Construct and parse global argv
@@ -45,40 +37,40 @@ class ParseArgv {
         
         // Don't care about the php file
         unset($argv_[0]);
-        
-        // Set flagValues '--flag=test', '-f=test'
-        // Set valuesBy
+
         foreach ($argv_ as $arg) {
-            // - and -- are commands
+
+            // Get commands ('-', '--')
             if (preg_match("/^[-]{1,2}/", $arg)) {
                 $arg = preg_replace("/^[-]{1,2}/", '', $arg);
-                
-                $flag = $this->getFlagKey($arg);
-                $value = $this->getFlagValue($arg);
-                $this->flags[$flag] = $value;
-            } else {
-                $this->values[$arg] = $arg;
-                $this->valuesByKey[] = $arg;
+                $option = $this->getOptionKey($arg);
+                $value = $this->getOptionsValue($arg);
+                $this->options[$option] = $value;
+            } 
+            
+            // Get arguments
+            else {
+                $this->arguments[] = $arg;
             }
         }
     }
     
     /**
-     * Get flag key from arg
+     * Get option key from option string
      * @param string $arg
      * @return string $value
      */
-    private function getFlagKey ($arg) {
+    private function getOptionKey ($arg) {
         $ary = explode('=', $arg);
         return $ary[0];
     }
     
     /**
-     * Get flag value from arg
+     * Get option value from option string
      * @param string $arg
      * @return string
      */
-    private function getFlagValue ($arg) {
+    private function getOptionsValue ($arg) {
         $ary = explode('=', $arg);
         if (empty($ary[1])) {
             return '';
@@ -88,59 +80,55 @@ class ParseArgv {
     
     
     /**
-     * Return a flag value by key
+     * Return a option from options. If the option is not set return 'null'
+     * If the option is set return the option value as a string. If the option is set
+     * but does not have any value return true
      */
-    public function getFlag ($key) {
-        if (isset($this->flags[$key])) {
-            if ($this->flags[$key] === '') {
+    public function getOption ($key) {
+        if (isset($this->options[$key])) {
+
+            // Flag exists, but no value
+            if ($this->options[$key] === '') {
                 return true;
             }
-            return $this->flags[$key];
-        }
-    }
 
-    public function getOption($option) {
-        return $this->getFlag($option);
-    }
-    
-    /**
-     * Return a value by key
-     */
-    public function getValue ($key) {
-        if (isset($this->values[$key])) {
-            return $this->values[$key];
+            // Flag has a value
+            return $this->options[$key];
         }
     }
     
     /**
-     * Get a 
+     * Check if a argument exists
      */
-    public function getValueByKey ($key) {
-        if (isset($this->valuesByKey[$key])) {
-            return $this->valuesByKey[$key];
-        }
-    }
-
-    /**
-     * Get argument
-     * E.g. getArgument(0) will get the first argument
-     * getArgument(1) will get the second argument
-     */
-    public function getArgument($index) {
-        return $this->getValueByKey($index);
-    }
-    
-    /**
-     * Unset a value from valuesByKey. 
-     * It is used when a command is found, so that the command does not count as argument
-     */
-    public function unsetValue(string $val) {
-        foreach($this->valuesByKey as $k => $value) {
-            
-            if ($value === $val) {
-                unset($this->valuesByKey[$k]);
-                $this->valuesByKey = array_values($this->valuesByKey);
+    public function argumentExists ($value) {
+        foreach ($this->arguments as $val) {
+            if ($val === $value) {
+                return true;
             }
         }
+    }
+    
+    /**
+     * Get argument
+     */
+    public function getArgument ($key) {
+        if (isset($this->arguments[$key])) {
+            return $this->arguments[$key];
+        }
+    }
+    
+    /**
+     * Unset a value from arguments_by_key. 
+     * It is used when a sub-command is found, so that the sub-command does not count as an argument
+     */
+    public function unsetArgument(string $val) {
+        foreach($this->arguments as $k => $value) {
+            
+            if ($value === $val) {
+                unset($this->arguments[$k]);
+            }
+        }
+
+        $this->arguments = array_values($this->arguments);
     }
 }

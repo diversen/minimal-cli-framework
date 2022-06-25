@@ -7,7 +7,7 @@ include_once "vendor/autoload.php";
 // with the above include. This is just to make it easy to test.
 include_once "Cli/Utils.php";
 
-use diversen\Cli\Utils;
+use Diversen\Cli\Utils;
 
 $utils = new Utils();
 

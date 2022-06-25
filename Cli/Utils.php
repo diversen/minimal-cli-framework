@@ -1,8 +1,8 @@
 <?php
 
-namespace diversen\Cli;
+namespace Diversen\Cli;
 
-use diversen\MinimalCli;
+use Diversen\MinimalCli;
 
 /**
  * common helper function in CLI env.

@@ -78,12 +78,17 @@ class MinimalCli
     public function runMain()
     {
         $this->parse = new ParseArgv();
-        $keys = array_keys($this->commands);
+        $commands = array_keys($this->commands);
 
-        foreach ($keys as $command) {
+        foreach ($commands as $command) {
 
-            if ($this->parse->getValue($command)) {
-                $this->parse->unsetValue($command);
+            // command exist as a value
+            if ($this->parse->argumentExists($command)) {
+                
+                // Unset the value
+                $this->parse->unsetArgument($command);
+
+                // Execute
                 $res = $this->execute($command);
                 exit($res);
             }
@@ -117,7 +122,7 @@ class MinimalCli
         
         $str = $this->header . $this->NL . $this->NL;
 
-        $p = new padding();
+        $p = new Padding();
 
         $help_main = $this->getHelpMain();
 
@@ -208,9 +213,9 @@ class MinimalCli
         $obj = $this->commands[$command];
 
         $allowed_options = $this->getAllowedOptions($command);
-        $this->prepareFlags($allowed_options);
+        $this->prepareOptions($allowed_options);
 
-        if (isset($this->parse->flags['help'])) {
+        if (isset($this->parse->options['help'])) {
             if (method_exists($obj, 'getCommand')) {
                 $this->executeCommandHelp($command);
                 exit(0);
@@ -226,49 +231,49 @@ class MinimalCli
         return $obj->runCommand($this->parse);
     }
 
-    private function prepareFlags($allowed_options)
+    private function prepareOptions($allowed_options)
     {
 
-        foreach ($this->parse->flags as $flag => $key) {
-            $this->checkShorthand($allowed_options, $flag);
+        foreach ($this->parse->options as $option => $key) {
+            $this->checkShorthand($allowed_options, $option);
 
         }
     }
 
-    private function checkShorthand($allowed_options, $flag)
+    private function checkShorthand($allowed_options, $option)
     {
 
-        $c = 0;
         $set_option = '';
-        $possible = [];
-        foreach ($allowed_options as $key => $option) {
+        $possible_options = [];
+        foreach ($allowed_options as $opt) {
 
-            if (empty(trim($flag))) {
+            if (empty(trim($option))) {
                 continue;
             }
 
-            // Fine exact match
-            if ($option == $flag) {
+            // Exact match
+            if ($opt == $option) {
                 return;
             }
 
-            // Match between option and a flag
-            if (strpos($option, $flag) === 0) {
-                $possible[] = $option;
-                $set_option = $option;
-                $c++;
+            // Match between option and a option
+            if (strpos($opt, $option) === 0) {
+                $possible_options[] = $opt;
+                $set_option = $opt;
             }
         }
 
-        if ($c === 1) {
-            $value = $this->parse->getFlag($flag);
-            $this->parse->flags[$set_option] = $value;
-            unset($this->parse->flags[$flag]);
+        if (count($possible_options) === 1) {
+            $value = $this->parse->getOption($option);
+            $this->parse->options[$set_option] = $value;
+            unset($this->parse->options[$option]);
             return true;
-        } else if ($c > 1) {
+        } 
+        
+        else if ($possible_options > 1) {
             $str = "Ambiguous shorthand for option given: ";
-            $str .= $this->colorOutput($flag, $this->colorError) . $this->NL;
-            $str .= "Possible values are: " . $this->colorOutput(implode(', ', $possible), $this->colorNotice) . $this->NL;
+            $str .= $this->colorOutput($option, $this->colorError) . $this->NL;
+            $str .= "Possible_options values are: " . $this->colorOutput(implode(', ', $possible_options), $this->colorNotice) . $this->NL;
             echo $str;
             exit(128);
         }
@@ -285,7 +290,7 @@ class MinimalCli
     {
         $allowed = $this->getAllowedOptions($command);
 
-        foreach ($this->parse->flags as $key => $flag) {
+        foreach ($this->parse->options as $key => $option) {
             if (!in_array($key, $allowed)) {
                 return $key;
             }

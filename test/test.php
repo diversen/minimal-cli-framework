@@ -7,7 +7,7 @@ include_once "vendor/autoload.php";
 // with the above include. This is just to make it easy to test.
 include_once "MinimalCli.php";
 
-use diversen\MinimalCli;
+use Diversen\MinimalCli;
 
 class echoTest {
 
@@ -37,7 +37,7 @@ class echoTest {
     public function runCommand($args) {
 
         $str = '';
-        $file = $args->getValueByKey(0);
+        $file = $args->getArgument(0);
         if ($file) {
             $str = $this->getFileStr($file);
         } else {
@@ -45,10 +45,10 @@ class echoTest {
             exit(0);
         }
         
-        if ($args->getFlag('strtoupper')) {
+        if ($args->getOption('strtoupper')) {
             echo strtoupper($str) . "\n";
         }
-        if ($args->getFlag('strtolower')) {
+        if ($args->getOption('strtolower')) {
             echo strtolower($str) . PHP_EOL;
         }
         return 0;

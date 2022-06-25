@@ -13,7 +13,7 @@ exisiting class you will just need to add two methods: `getCommand` and
 
 Example using a single simple command: 
 
-See [test.php](test.php) which has a single command (`echo`):
+See [test/test.php](test/test.php) which has a single command (`echo`):
 
 In to get help on the command `echo`
 
@@ -29,7 +29,7 @@ Which will output the file in uppercase
 
 Some common CLI helpers. 
 
-See [utils_test.php](utils_test.php)
+See [test/utils_test.php](test/utils_test.php)
 
 Colors are supported with [https://github.com/php-parallel-lint/PHP-Console-Color](https://github.com/php-parallel-lint/PHP-Console-Color)
 
