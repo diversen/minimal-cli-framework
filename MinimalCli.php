@@ -54,18 +54,22 @@ class MinimalCli
     {
 
         // Built-in main options
-        $main_options = array(
-            'main_options' => array(
+        $main_options = [
+            'main_options' => [
                 '--help' => 'Will output help. Specify command followed by --help to get specific help on a command',
-                '--verbose' => 'verbose output'),
-        );
+                '-h'     => 'Shorthand for --help',
+                '--verbose' => 'verbose output'
+            ],
+        ];
 
         // Get all commands main options
-        $help_ary = $this->getHelp();
+        $help_ary = $this->getAllCommandsHelp();
         foreach ($help_ary as $val) {
             if (isset($val['main_options'])) {
                 $main_options['main_options'] = array_merge(
-                    $main_options['main_options'], $val['main_options']);
+                    $main_options['main_options'],
+                    $val['main_options']
+                );
             }
         }
 
@@ -73,53 +77,46 @@ class MinimalCli
     }
 
     /**
-     * Run the main CLI script
+     * Run the main script
      */
     public function runMain()
     {
         $this->parse = new ParseArgv();
-        $commands = array_keys($this->commands);
+        $command = $this->parse->getArgument(0);
 
-        foreach ($commands as $command) {
+        if (isset($this->commands[$command])) {
 
-            // command exist as a value
-            if ($this->parse->argumentExists($command)) {
-                
-                // Unset the value
-                $this->parse->unsetArgument($command);
-
-                // Execute
-                $res = $this->execute($command);
-                exit($res);
-            }
+            // Unset command from arguments
+            $this->parse->unsetArgument(0);
+            $res = $this->executeCommand($command);
+            exit($res);
         }
 
         $this->executeMainHelp();
+        exit(1);
     }
 
     /**
-     * Get help from a all commands
+     * Get help section of all commands as an array
      */
-    private function getHelp()
+    private function getAllCommandsHelp()
     {
 
         $help = [];
-        foreach ($this->commands as $key => $command) {
-            if (method_exists($command, 'getCommand')) {
-                $help[$key] = $command->getCommand();
-            }
+        foreach ($this->commands as $command_name => $command_obj) {
+            $help[$command_name] = $command_obj->getCommand();
         }
         return $help;
     }
 
     /**
-     * Displays help text
+     * Display the main help
      */
     private function executeMainHelp()
     {
 
         global $argv;
-        
+
         $str = $this->header . $this->NL . $this->NL;
 
         $p = new Padding();
@@ -131,37 +128,34 @@ class MinimalCli
         $str .= '  ' . $this->colorOutput($argv[0], $this->colorSuccess) . ' [--options] [command] [--options] [arguments]';
         $str .= $this->NL . $this->NL;
 
+        // Main options
         $main_options = $help_main['main_options'];
         $ary_main = [];
-        foreach ($main_options as $option => $desc) {
-            $ary_main[] = array(
-                $this->colorOutput($option, $this->colorSuccess), $desc,
-            );
+        foreach ($main_options as $option_name => $description) {
+            $ary_main[] = [$this->colorOutput($option_name, $this->colorSuccess), $description];
         }
 
         $str .= $this->colorOutput('Options across all commands', $this->colorNotice) . $this->NL;
         $str .= $p->padArray($ary_main) . $this->NL;
 
-        $help_ary = $this->getHelp();
+        // Show all commands
+        $help_ary = $this->getAllCommandsHelp();
 
-        $ary_sub = [];
-        foreach ($help_ary as $key => $val) {
-            $a = [];
-            $a[] = $this->colorOutput($key, $this->colorSuccess);
-            $a[] = $val['usage'];
-            $ary_sub[] = $a;
+        $command_ary = [];
+        foreach ($help_ary as $command_name => $command_help) {
+            $command = [];
+            $command[] = $this->colorOutput($command_name, $this->colorSuccess);
+            $command[] = $command_help['usage'];
+            $command_ary[] = $command;
         }
 
         $str .= $this->colorOutput("Available commands", $this->colorNotice) . $this->NL;
-        $str .= $p->padArray($ary_sub);
+        $str .= $p->padArray($command_ary);
         echo $str;
     }
 
     /**
-     * Color a string according
-     * @param string $str
-     * @param string $color
-     * @return string $str colored
+     * Color a string according to a color
      */
     public function colorOutput($str, $color = 'y')
     {
@@ -183,13 +177,10 @@ class MinimalCli
             return $consoleColor->apply("$color", $str);
         }
         return $str;
-
     }
 
-
-
     /**
-     * Method to validate command and fill in empty array
+     * Return an empty array if no command option or command arguments
      * @param array $command
      */
     private function validateHelp($command)
@@ -207,103 +198,48 @@ class MinimalCli
      * Execute a command
      * @param string $command
      */
-    public function execute($command)
+    private function executeCommand($command)
     {
 
-        $obj = $this->commands[$command];
-
-        $allowed_options = $this->getAllowedOptions($command);
-        $this->prepareOptions($allowed_options);
-
-        if (isset($this->parse->options['help'])) {
-            if (method_exists($obj, 'getCommand')) {
-                $this->executeCommandHelp($command);
-                exit(0);
-            }
+        $command_obj = $this->commands[$command];
+        if (isset($this->parse->options['help']) || isset($this->parse->options['h'])) {
+            $this->executeCommandHelp($command);
+            exit(0);
         }
 
-        $res = $this->validateCommand($command);
-        if ($res !== true) {
-            echo $this->colorOutput($res . " is not allowed as option\n", $this->colorError);
+        if ($this->validateCommandOptions($command) !== true) {
+            $invalid_option = $this->validateCommandOptions($command);
+            echo $this->colorOutput($invalid_option . " is not allowed as option\n", $this->colorError);
             exit(128);
         }
 
-        return $obj->runCommand($this->parse);
+        return $command_obj->runCommand($this->parse);
     }
-
-    private function prepareOptions($allowed_options)
-    {
-
-        foreach ($this->parse->options as $option => $key) {
-            $this->checkShorthand($allowed_options, $option);
-
-        }
-    }
-
-    private function checkShorthand($allowed_options, $option)
-    {
-
-        $set_option = '';
-        $possible_options = [];
-        foreach ($allowed_options as $opt) {
-
-            if (empty(trim($option))) {
-                continue;
-            }
-
-            // Exact match
-            if ($opt == $option) {
-                return;
-            }
-
-            // Match between option and a option
-            if (strpos($opt, $option) === 0) {
-                $possible_options[] = $opt;
-                $set_option = $opt;
-            }
-        }
-
-        if (count($possible_options) === 1) {
-            $value = $this->parse->getOption($option);
-            $this->parse->options[$set_option] = $value;
-            unset($this->parse->options[$option]);
-            return true;
-        } 
-        
-        else if ($possible_options > 1) {
-            $str = "Ambiguous shorthand for option given: ";
-            $str .= $this->colorOutput($option, $this->colorError) . $this->NL;
-            $str .= "Possible_options values are: " . $this->colorOutput(implode(', ', $possible_options), $this->colorNotice) . $this->NL;
-            echo $str;
-            exit(128);
-        }
-    }
-
-
 
     /**
-     * Validate a command
-     * @param string $command
-     * @return mixed true if command is OK else the command as str
+     * Validate options given to a command
+     * @param string the command
+     * @return mixed true if the command is valid or a string with the invalid option
      */
-    private function validateCommand($command)
+    private function validateCommandOptions($command)
     {
         $allowed = $this->getAllowedOptions($command);
+        $options = array_keys($this->parse->options);
 
-        foreach ($this->parse->options as $key => $option) {
-            if (!in_array($key, $allowed)) {
-                return $key;
+        foreach ($options as $option) {
+            if (!in_array($option, $allowed)) {
+                return $option;
             }
         }
         return true;
     }
 
     /**
-     * Get all allowed options from main and command
-     * @param string $command
-     * @return array $allowed
+     * Get all allowed options from main and a single command
+     * @param string command
+     * @return array allowed options
      */
-    public function getAllowedOptions($command)
+    private function getAllowedOptions($command)
     {
 
         // Allowed main options
@@ -311,12 +247,11 @@ class MinimalCli
         $allowed_options = array_keys($main['main_options']);
 
         // Allow command options
-        $command_help = $this->getHelp();
+        $command_help = $this->getAllCommandsHelp();
         if (isset($command_help[$command])) {
-
             $command_help[$command] = $this->validateHelp($command_help[$command]);
-            $allowed_options = array_merge(
-                $allowed_options, array_keys($command_help[$command]['options']));
+            $allowed_command_options = array_keys($command_help[$command]['options']);
+            $allowed_options = array_merge($allowed_options, $allowed_command_options);
         }
 
         $allowed = [];

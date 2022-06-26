@@ -22,18 +22,20 @@ class ParseArgv {
     /**
      * Construct and parse global argv
      */
-    public function __construct() {
-        $this->parse();
+    public function __construct(array $argv_ = null) {
+        $this->parse($argv_);
     }
     
     /**
-     * Parse argv
+     * Parse argv. If $argv_ is not set then use global $argv
      * @global array $argv
      */
-    public function parse() {
-        global $argv;
-
-        $argv_ = $argv;
+    public function parse(array $argv_ = null) {
+        
+        if (!$argv_) {
+            global $argv;
+            $argv_ = $argv;
+        }
         
         // Don't care about the php file
         unset($argv_[0]);
@@ -84,32 +86,51 @@ class ParseArgv {
      * If the option is set return the option value as a string. If the option is set
      * but does not have any value return true
      */
-    public function getOption ($key) {
-        if (isset($this->options[$key])) {
+    public function getOption ($option) {
+        if (isset($this->options[$option])) {
 
             // Flag exists, but no value
-            if ($this->options[$key] === '') {
+            if ($this->options[$option] === '') {
                 return true;
             }
 
             // Flag has a value
-            return $this->options[$key];
+            return $this->options[$option];
         }
     }
-    
+
     /**
-     * Check if a argument exists
+     * Checks if at least one option in a given array of options is set in the argv options
      */
-    public function argumentExists ($value) {
-        foreach ($this->arguments as $val) {
-            if ($val === $value) {
+    public function inOptions($options) {
+        $argv_options = array_keys($this->options);
+        foreach($argv_options as $option) {
+            if (in_array($option, $options)) {
                 return true;
             }
         }
+        return false;
+        
+    }
+
+    /**
+     * Does an option exist, by value, e.g. 'help'
+     */
+    public function optionExists ($option) {
+        return isset($this->options[$option]);
     }
     
     /**
-     * Get argument
+     * Does an argument exists (by index, e.g. 0)
+     */
+    public function argumentExists ($key) {
+        if (isset($this->arguments[$key])) {
+            return true;
+        }
+    }
+    
+    /**
+     * Get argument by index (e.g. 0)
      */
     public function getArgument ($key) {
         if (isset($this->arguments[$key])) {
@@ -119,15 +140,9 @@ class ParseArgv {
     
     /**
      * Unset a value from arguments_by_key. 
-     * It is used when a sub-command is found, so that the sub-command does not count as an argument
      */
-    public function unsetArgument(string $val) {
-        foreach($this->arguments as $k => $value) {
-            
-            if ($value === $val) {
-                unset($this->arguments[$k]);
-            }
-        }
+    public function unsetArgument($key) {
+        unset($this->arguments[$key]);
 
         $this->arguments = array_values($this->arguments);
     }

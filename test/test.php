@@ -18,7 +18,9 @@ class echoTest {
                 'usage' => 'Command to make string to upper and lower case',
                 'options' => array (
                     '--strtoupper' => 'Will put string in uppercase',
+                    '-u' => 'Shorthand for strtoupper',
                     '--strtolower' => 'Will put string in lowercase'),
+                    '-l' => 'Shorthand for strtolower',
                 // Add a main options, which all commands will have access to
                 'main_options' => array (
                     '--main' => 'Test with a main option'
@@ -31,33 +33,27 @@ class echoTest {
     }
 
     /**
-     * 
+     * Run the command and return the result 
      * @param diversen\parseArgv $args
      */
     public function runCommand($args) {
 
-        $str = '';
         $file = $args->getArgument(0);
-        if ($file) {
-            $str = $this->getFileStr($file);
-        } else {
-            echo "Specify file" . "\n";
-            exit(0);
+        if (!file_exists($file)) {
+            echo "No such file" . PHP_EOL;
+            return 1;
         }
-        
-        if ($args->getOption('strtoupper')) {
-            echo strtoupper($str) . "\n";
+
+        $input = file_get_contents($file);         
+        if ($args->inOptions(['strtoupper', 'u'])) {
+            $output = strtoupper($input) . PHP_EOL;
         }
-        if ($args->getOption('strtolower')) {
-            echo strtolower($str) . PHP_EOL;
+        if ($args->inOptions(['strtolower', 'l'])) {
+            $output = strtolower($input) . PHP_EOL;
         }
+
+        echo $output;
         return 0;
-    }
-    
-    public function getFileStr ($file) {
-        if ($file && file_exists($file)) {
-            return file_get_contents($file);  
-        } 
     }
 }
 
