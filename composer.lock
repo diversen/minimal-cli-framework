@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "9759d8d3f062c33e99d649cf32082fe3",
+    "content-hash": "e7c74d029e97d38e137bf3a4ecf7aa34",
     "packages": [
         {
             "name": "diversen/console-padding",
@@ -47,6 +47,56 @@
                 "source": "https://github.com/diversen/console-padding/tree/v2.0.0"
             },
             "time": "2022-06-25T10:47:48+00:00"
+        },
+        {
+            "name": "diversen/parse-argv",
+            "version": "v3.0.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/diversen/parse-argv.git",
+                "reference": "84f6e1236cb550d950d80a15bdb0c138eaaa901d"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/diversen/parse-argv/zipball/84f6e1236cb550d950d80a15bdb0c138eaaa901d",
+                "reference": "84f6e1236cb550d950d80a15bdb0c138eaaa901d",
+                "shasum": ""
+            },
+            "type": "library",
+            "extra": {
+                "branch-alias": {
+                    "dev-master": "v1.2-dev"
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Diversen\\": ""
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Dennis Iversen",
+                    "email": "dennis.iversen@gmail.com",
+                    "homepage": "http://www.coscms.org/",
+                    "role": "Developer"
+                }
+            ],
+            "description": "Parse argv and get - and -- flags and values, and get any value without a flag.",
+            "homepage": "http://github.com/diversen/parse-argv",
+            "keywords": [
+                "argv",
+                "cli",
+                "console"
+            ],
+            "support": {
+                "issues": "https://github.com/diversen/parse-argv/issues",
+                "source": "https://github.com/diversen/parse-argv/tree/v3.0.0"
+            },
+            "time": "2022-06-26T10:45:30+00:00"
         },
         {
             "name": "php-parallel-lint/php-console-color",

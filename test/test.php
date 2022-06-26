@@ -18,9 +18,7 @@ class echoTest {
                 'usage' => 'Command to make string to upper and lower case',
                 'options' => array (
                     '--strtoupper' => 'Will put string in uppercase',
-                    '-u' => 'Shorthand for strtoupper',
                     '--strtolower' => 'Will put string in lowercase'),
-                    '-l' => 'Shorthand for strtolower',
                 // Add a main options, which all commands will have access to
                 'main_options' => array (
                     '--main' => 'Test with a main option'
@@ -39,6 +37,10 @@ class echoTest {
     public function runCommand($args) {
 
         $file = $args->getArgument(0);
+        if (!$file) {
+            echo "No file was specified" . PHP_EOL;
+            return 1;
+        }
         if (!file_exists($file)) {
             echo "No such file" . PHP_EOL;
             return 1;

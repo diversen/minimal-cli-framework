@@ -201,11 +201,17 @@ class MinimalCli
     private function executeCommand($command)
     {
 
+        $allowed_options = $this->getAllowedOptions($command);
+        // $this->checkShorthandOptions($allowed_options);
+        $this->rewriteShorthandOptions($allowed_options);
+
         $command_obj = $this->commands[$command];
         if (isset($this->parse->options['help']) || isset($this->parse->options['h'])) {
             $this->executeCommandHelp($command);
             exit(0);
         }
+
+
 
         if ($this->validateCommandOptions($command) !== true) {
             $invalid_option = $this->validateCommandOptions($command);
@@ -214,6 +220,60 @@ class MinimalCli
         }
 
         return $command_obj->runCommand($this->parse);
+    }
+
+    private function rewriteShorthandOptions($allowed_options)
+    {
+
+        $options = array_keys($this->parse->options);
+        foreach ($options as $option) {
+            $this->rewriteShorthand($allowed_options, $option);
+        }
+    }
+
+    /** 
+     * Check if an option can be used as shorthand. E.g: '--strtolower' may be an option
+     * 
+     * Check if e.g. '-s' is set then check if shorthand option is ambiguous
+     * If it is not ambiguous, then set options['strtolower'] with the value 
+     * */
+    private function rewriteShorthand($allowed_options, $option_to_check)
+    {
+
+        $set_option = '';
+        $possible = [];
+        foreach ($allowed_options as $option) {
+
+            // Found exact match. No ambiguous option
+            if ($option == $option_to_check) {
+                return;
+            }
+
+            // Match between allowed option adnd option to check 
+            if (strpos($option, $option_to_check) === 0) {
+                $possible[] = $option;
+                $set_option = $option;
+            }
+        }
+
+        $possible_options = count($possible);
+        
+        // Rewrite if only one possible valid option for the shorthand given
+        if ($possible_options === 1) {
+            $value = $this->parse->getOption($option_to_check);
+            $this->parse->options[$set_option] = $value;
+            unset($this->parse->options[$option_to_check]);
+            return true;
+        } 
+
+        // If the shorthand option give has more than one valid option then exit with an error.
+        if ($possible_options > 1) {
+            $str = "Ambiguous shorthand for option given: ";
+            $str .= $this->colorOutput($option_to_check, $this->colorError) . $this->NL;
+            $str .= "Possible values are: " . $this->colorOutput(implode(', ', $possible), $this->colorNotice) . $this->NL;
+            echo $str;
+            exit(128);
+        }
     }
 
     /**

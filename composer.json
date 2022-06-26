@@ -11,7 +11,8 @@
     ],
     "require": {
         "diversen/console-padding": "^2.0",
-        "php-parallel-lint/php-console-color": "^1.0"
+        "php-parallel-lint/php-console-color": "^1.0",
+        "diversen/parse-argv": "^3.0"
     },
     "autoload": {
         "psr-4": {
