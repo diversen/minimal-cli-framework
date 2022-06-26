@@ -3,54 +3,58 @@
 
 include_once "vendor/autoload.php";
 
-// You will not need the following include if you are autoloading 
-// with the above include. This is just to make it easy to test.
-include_once "MinimalCli.php";
-
 use Diversen\MinimalCli;
 
-class echoTest {
+class echoTest
+{
 
     // Return main commands help
-    public function getCommand() {
-        return 
-            array (
-                'usage' => 'Command to make string to upper and lower case',
-                'options' => array (
-                    '--strtoupper' => 'Will put string in uppercase',
-                    '--strtolower' => 'Will put string in lowercase'),
-                // Add a main options, which all commands will have access to
-                'main_options' => array (
-                    '--main' => 'Test with a main option'
-                ),
-                
-                'arguments' => array (
-                    'File' => 'Read from a file and out put to stdout'
-                )
-            );
+    public function getCommand()
+    {
+        return [
+
+            'usage' => 'Command to make string to upper and lower case',
+
+            // Command options
+            'options' => [
+                '--strtoupper' => 'Will put string in uppercase',
+                '--strtolower' => 'Will put string in lowercase'
+            ],
+
+            // Add a main options, which all commands will have access to
+            'main_options' => [
+                '--main' => 'Test with a main option'
+            ],
+
+            'arguments' => [
+                'File' => 'Read from a file and out put to stdout'
+            ]
+        ];
     }
 
     /**
      * Run the command and return the result 
-     * @param diversen\parseArgv $args
+     * @param Diversen\ParseArgv $args
      */
-    public function runCommand($args) {
+    public function runCommand(\Diversen\ParseArgv $args)
+    {
 
         $file = $args->getArgument(0);
         if (!$file) {
             echo "No file was specified" . PHP_EOL;
             return 1;
         }
+
         if (!file_exists($file)) {
             echo "No such file" . PHP_EOL;
             return 1;
         }
 
-        $input = file_get_contents($file);         
-        if ($args->inOptions(['strtoupper', 'u'])) {
+        $input = file_get_contents($file);
+        if ($args->getOption('strtoupper')) {
             $output = strtoupper($input) . PHP_EOL;
         }
-        if ($args->inOptions(['strtolower', 'l'])) {
+        if ($args->getOption('strtolower')) {
             $output = strtolower($input) . PHP_EOL;
         }
 
@@ -60,13 +64,7 @@ class echoTest {
 }
 
 $header = <<<EOF
- _____         _   
-|_   _|       | |  
-  | | ___  ___| |_ 
-  | |/ _ \/ __| __|
-  | |  __/\__ \ |_ 
-  \_/\___||___/\__|
-
+TEST COMMAND
 EOF;
 
 $echo = new echoTest();

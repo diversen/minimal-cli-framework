@@ -23,6 +23,8 @@ Usage could then be:
 
     php test/test.php echo --strtoupper README.md
 
+    php test/test.php echo --strtoupper README.md
+
 Which will output the file in uppercase
 
 # Helpers
