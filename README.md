@@ -21,9 +21,11 @@ In to get help on the command `echo`
 
 Usage could then be: 
 
-    php test/test.php echo --strtoupper README.md
+    php test/test.php echo --up README.md
 
-    php test/test.php echo --strtoupper README.md
+Or: 
+
+    php test/test.php echo -u README.md
 
 Which will output the file in uppercase
 

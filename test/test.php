@@ -17,8 +17,8 @@ class echoTest
 
             // Command options
             'options' => [
-                '--strtoupper' => 'Will put string in uppercase',
-                '--strtolower' => 'Will put string in lowercase'
+                '--up' => 'Will put string in uppercase',
+                '--low' => 'Will put string in lowercase'
             ],
 
             // Add a main options, which all commands will have access to
@@ -51,12 +51,16 @@ class echoTest
         }
 
         $input = file_get_contents($file);
-        if ($args->getOption('strtoupper')) {
+
+        if ($args->getOption('up')) {
             $output = strtoupper($input) . PHP_EOL;
         }
-        if ($args->getOption('strtolower')) {
+        else if ($args->getOption('low')) {
             $output = strtolower($input) . PHP_EOL;
-        }
+        } 
+        else {
+            $output = $input . PHP_EOL;
+        } 
 
         echo $output;
         return 0;
