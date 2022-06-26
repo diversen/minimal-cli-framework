@@ -118,7 +118,7 @@ class Utils extends MinimalCli
     /**
      * function for executing commands with php function exec
      * @param   string  $command to execute
-     * @param   boolean $status_message display status message of exec command or not
+     * @param   boolean $status_message display a status message (OK or ERROR)
      * @param   boolean $output echo output of command or not
      * @return  int     $ret the value returned by the shell script being
      *                  executed through exec()
