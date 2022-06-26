@@ -31,6 +31,8 @@ Some common CLI helpers.
 
 See [test/utils_test.php](test/utils_test.php)
 
+    php test/utils_test.php 
+
 Colors are supported with [https://github.com/php-parallel-lint/PHP-Console-Color](https://github.com/php-parallel-lint/PHP-Console-Color)
 
 License: MIT
