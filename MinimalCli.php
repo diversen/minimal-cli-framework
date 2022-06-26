@@ -228,6 +228,9 @@ class MinimalCli
         return $command_obj->runCommand($this->parse);
     }
 
+    /**
+     * Rewrite short options
+     */
     private function rewriteShorthandOptions($allowed_options)
     {
 
@@ -333,7 +336,7 @@ class MinimalCli
      * Execute specified command help
      * @param string $command
      */
-    public function executeCommandHelp($command)
+    private function executeCommandHelp($command)
     {
         $obj = $this->commands[$command];
         $help = $obj->getCommand();
