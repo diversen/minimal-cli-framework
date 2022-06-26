@@ -57,7 +57,6 @@ class MinimalCli
         $main_options = [
             'main_options' => [
                 '--help' => 'Will output help. Specify command followed by --help to get specific help on a command',
-                '-h'     => 'Shorthand for --help',
                 '--verbose' => 'verbose output'
             ],
         ];
@@ -84,7 +83,11 @@ class MinimalCli
         $this->parse = new ParseArgv();
         $command = $this->parse->getArgument(0);
 
-        if (isset($this->commands[$command])) {
+        if (!$command) {
+            $this->executeMainHelp();
+        }
+
+        else if (isset($this->commands[$command])) {
 
             // Unset command from arguments
             $this->parse->unsetArgument(0);
@@ -92,7 +95,11 @@ class MinimalCli
             exit($res);
         }
 
-        $this->executeMainHelp();
+        else {
+            echo $this->colorOutput('No valid command', 'r') . PHP_EOL;    
+        }
+
+        
         exit(1);
     }
 
@@ -201,17 +208,16 @@ class MinimalCli
     private function executeCommand($command)
     {
 
+        // Rewrite shorthand options
+        // E.g. use -h instead or --help
         $allowed_options = $this->getAllowedOptions($command);
-        // $this->checkShorthandOptions($allowed_options);
         $this->rewriteShorthandOptions($allowed_options);
 
         $command_obj = $this->commands[$command];
-        if (isset($this->parse->options['help']) || isset($this->parse->options['h'])) {
+        if (isset($this->parse->options['help'])) {
             $this->executeCommandHelp($command);
             exit(0);
         }
-
-
 
         if ($this->validateCommandOptions($command) !== true) {
             $invalid_option = $this->validateCommandOptions($command);
