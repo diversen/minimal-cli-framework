@@ -4,10 +4,15 @@ namespace Diversen;
 
 use Diversen\Padding;
 use Diversen\ParseArgv;
-use PHP_Parallel_Lint\PhpConsoleColor\ConsoleColor;
+use Diversen\Cli\Utils;
 
 class MinimalCli
 {
+
+    protected $utils;
+    public function __construct($settings = []){
+        $this->utils = new Utils($settings);
+    }
 
     /**
      * Array holding command objects
@@ -20,21 +25,6 @@ class MinimalCli
      * @var \Diversen\parseArgv
      */
     public $parse = null;
-
-    /**
-     * Color of success
-     */
-    public $colorSuccess = 'green';
-
-    /**
-     * Color of notice
-     */
-    public $colorNotice = 'yellow';
-
-    /**
-     * Color of error
-     */
-    public $colorError = 'red';
 
     /**
      * Set a header notice
@@ -96,7 +86,7 @@ class MinimalCli
         }
 
         else {
-            echo $this->colorOutput('No valid command', 'r') . PHP_EOL;    
+            echo $this->utils->colorOutput('No valid command', $this->utils->colorError) . PHP_EOL;    
         }
 
         
@@ -131,18 +121,18 @@ class MinimalCli
         $help_main = $this->getHelpMain();
 
         // Usage
-        $str .= $this->colorOutput('Usage', $this->colorNotice) . $this->NL;
-        $str .= '  ' . $this->colorOutput($argv[0], $this->colorSuccess) . ' [--options] [command] [--options] [arguments]';
+        $str .= $this->utils->colorOutput('Usage', $this->utils->colorNotice) . $this->NL;
+        $str .= '  ' . $this->utils->colorOutput($argv[0], $this->utils->colorSuccess) . ' [--options] [command] [--options] [arguments]';
         $str .= $this->NL . $this->NL;
 
         // Main options
         $main_options = $help_main['main_options'];
         $ary_main = [];
         foreach ($main_options as $option_name => $description) {
-            $ary_main[] = [$this->colorOutput($option_name, $this->colorSuccess), $description];
+            $ary_main[] = [$this->utils->colorOutput($option_name, $this->utils->colorSuccess), $description];
         }
 
-        $str .= $this->colorOutput('Options across all commands', $this->colorNotice) . $this->NL;
+        $str .= $this->utils->colorOutput('Options across all commands', $this->utils->colorNotice) . $this->NL;
         $str .= $p->padArray($ary_main) . $this->NL;
 
         // Show all commands
@@ -151,40 +141,16 @@ class MinimalCli
         $command_ary = [];
         foreach ($help_ary as $command_name => $command_help) {
             $command = [];
-            $command[] = $this->colorOutput($command_name, $this->colorSuccess);
+            $command[] = $this->utils->colorOutput($command_name, $this->utils->colorSuccess);
             $command[] = $command_help['usage'];
             $command_ary[] = $command;
         }
 
-        $str .= $this->colorOutput("Available commands", $this->colorNotice) . $this->NL;
+        $str .= $this->utils->colorOutput("Available commands", $this->utils->colorNotice) . $this->NL;
         $str .= $p->padArray($command_ary);
         echo $str;
     }
 
-    /**
-     * Color a string according to a color
-     */
-    public function colorOutput($str, $color = 'y')
-    {
-
-        if ($color == 'y') {
-            $color = $this->colorNotice;
-        }
-
-        if ($color == 'g') {
-            $color = $this->colorSuccess;
-        }
-
-        if ($color == 'r') {
-            $color = $this->colorError;
-        }
-
-        $consoleColor = new ConsoleColor();
-        if ($consoleColor->isSupported()) {
-            return $consoleColor->apply("$color", $str);
-        }
-        return $str;
-    }
 
     /**
      * Return an empty array if no command option or command arguments
@@ -221,7 +187,7 @@ class MinimalCli
 
         if ($this->validateCommandOptions($command) !== true) {
             $invalid_option = $this->validateCommandOptions($command);
-            echo $this->colorOutput($invalid_option . " is not allowed as option\n", $this->colorError);
+            echo $this->utils->colorOutput($invalid_option . " is not allowed as option\n", $this->utils->colorError);
             exit(128);
         }
 
@@ -278,8 +244,8 @@ class MinimalCli
         // If the shorthand option give has more than one valid option then exit with an error.
         if ($possible_options > 1) {
             $str = "Ambiguous shorthand for option given: ";
-            $str .= $this->colorOutput($option_to_check, $this->colorError) . $this->NL;
-            $str .= "Possible values are: " . $this->colorOutput(implode(', ', $possible), $this->colorNotice) . $this->NL;
+            $str .= $this->utils->colorOutput($option_to_check, $this->utils->colorError) . $this->NL;
+            $str .= "Possible values are: " . $this->utils->colorOutput(implode(', ', $possible), $this->utils->colorNotice) . $this->NL;
             echo $str;
             exit(128);
         }
@@ -343,7 +309,7 @@ class MinimalCli
         $help = $this->validateHelp($help);
 
         // Usage should always be set
-        $output = $this->colorOutput("Usage", $this->colorNotice) . $this->NL;
+        $output = $this->utils->colorOutput("Usage", $this->utils->colorNotice) . $this->NL;
         $output .= '  ' . $help['usage'] . $this->NL;
 
         $p = new padding();
@@ -356,11 +322,11 @@ class MinimalCli
             $output .= $this->NL;
             foreach ($options as $option => $desc) {
                 $ary[] = array(
-                    $this->colorOutput($option, $this->colorSuccess), $desc,
+                    $this->utils->colorOutput($option, $this->utils->colorSuccess), $desc,
                 );
             }
 
-            $output .= $this->colorOutput("Options:", $this->colorNotice) . $this->NL;
+            $output .= $this->utils->colorOutput("Options:", $this->utils->colorNotice) . $this->NL;
             $output .= $p->padArray($ary);
         }
 
@@ -370,11 +336,11 @@ class MinimalCli
             $ary = [];
             foreach ($arguments as $argument => $desc) {
                 $ary[] = array(
-                    $this->colorOutput($argument, $this->colorSuccess), $desc,
+                    $this->utils->colorOutput($argument, $this->utils->colorSuccess), $desc,
                 );
             }
             $output .= $this->NL;
-            $output .= $this->colorOutput("Arguments:", $this->colorNotice) . $this->NL;
+            $output .= $this->utils->colorOutput("Arguments:", $this->utils->colorNotice) . $this->NL;
             $output .= $p->padArray($ary);
         }
         echo $output;

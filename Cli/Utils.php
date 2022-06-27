@@ -2,13 +2,39 @@
 
 namespace Diversen\Cli;
 
-use Diversen\MinimalCli;
+use PHP_Parallel_Lint\PhpConsoleColor\ConsoleColor;
 
 /**
  * common helper function in CLI env.
  */
-class Utils extends MinimalCli
+class Utils
 {
+
+
+    /**
+     * Color of success
+     */
+    public $colorSuccess = 'green';
+
+    /**
+     * Color of notice
+     */
+    public $colorNotice = 'yellow';
+
+    /**
+     * Color of error
+     */
+    public $colorError = 'red';
+
+    public function __construct($settings = null)
+    {
+
+        $this->colorSuccess = $settings['colorSuccess'] ?? $this->colorSuccess;
+        $this->colorNotice = $settings['colorNotice'] ?? $this->colorNotice;
+        $this->colorError = $settings['colorError'] ?? $this->colorError;
+        
+    }
+
 
     /**
      * checks is a user is root
@@ -60,22 +86,35 @@ class Utils extends MinimalCli
     }
 
     /**
+     * Color a string according to a color
+     */
+    public function colorOutput($str, $color = 'y')
+    {
+
+        if ($color == 'notice') {
+            $color = $this->colorNotice;
+        }
+
+        if ($color == 'success') {
+            $color = $this->colorSuccess;
+        }
+
+        if ($color == 'error') {
+            $color = $this->colorError;
+        }
+
+        $consoleColor = new ConsoleColor();
+        if ($consoleColor->isSupported()) {
+            return $consoleColor->apply("$color", $str);
+        }
+        return $str;
+    }
+
+    /**
      * echo a colored status message
      */
     public function echoStatus(string $status, string $color, string $mes)
     {
-
-        if ($color == 'y') {
-            $color = $this->colorNotice;
-        }
-
-        if ($color == 'g') {
-            $color = $this->colorSuccess;
-        }
-
-        if ($color == 'r') {
-            $color = $this->colorError;
-        }
 
         if ($this->isCli()) {
             echo $this->colorOutput($this->getColorStatus("[$status]"), $color);

@@ -29,15 +29,15 @@ echo $utils->colorOutput("Executing a command that does not exists (dudida)\n");
 $res = $utils->execCommand('dudida');
 echo $utils->colorOutput("$res is the result of the above operation\n", 'light_blue');
 
-echo $utils->colorOutput("Executing a command that does not exists (dudida) - but without status message and the executed commands output\n");
+echo $utils->colorOutput("Executing a command that does not exists (dudida) - and without status message and the executed commands output\n");
 $res = $utils->execCommand('dudida', 0, 0);
 echo $utils->colorOutput("$res is the result of the above operation\n", 'light_blue');
 
-echo $utils->colorOutput("Exectuing a command that that properbly exists (ls)\n");
+echo $utils->colorOutput("Exectuing a command that probably exists (ls)\n");
 $res = $utils->execCommand('ls -l');
 echo $utils->colorOutput("$res is the result of the above operation\n", 'light_blue');
 
-echo $utils->colorOutput("Exectuing a command that that properbly exists (ls) - but without status and command messages\n");
+echo $utils->colorOutput("Exectuing a command that probably exists (ls) - but without status and command messages\n");
 $res = $utils->execCommand('ls -l', 0, 0);
 echo $utils->colorOutput("$res is the result of the above operation\n", 'light_blue');
 

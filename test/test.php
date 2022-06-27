@@ -67,13 +67,28 @@ class echoTest
     }
 }
 
+/**
+ * Create a program where 'echo' is a command
+ */
+
 $header = <<<EOF
-TEST COMMAND
+TEST ECHO COMMAND
 EOF;
 
 $echo = new echoTest();
 $commands['echo'] = $echo;
-$m = new MinimalCli();
+
+/**
+ * Default settings for the CLI program. Only colors of output can be used
+ * These are the default settings
+ */
+$settings = [
+    'colorError' => 'red',
+    'colorSuccess' => 'green',
+    'colorNotice' => 'yellow',
+];
+
+$m = new MinimalCli(['colorError' => 'bg_light_red']);
 $m->commands = $commands;
 $m->header = $header;
 $m->runMain();
