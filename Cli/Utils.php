@@ -88,7 +88,7 @@ class Utils
     /**
      * Color a string according to a color
      */
-    public function colorOutput($str, $color = 'y')
+    public function colorOutput($str, $color = 'notice')
     {
 
         if ($color == 'notice') {
@@ -103,6 +103,7 @@ class Utils
             $color = $this->colorError;
         }
 
+        
         $consoleColor = new ConsoleColor();
         if ($consoleColor->isSupported()) {
             return $consoleColor->apply("$color", $str);

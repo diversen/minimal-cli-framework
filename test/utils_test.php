@@ -9,17 +9,30 @@ include_once "Cli/Utils.php";
 
 use Diversen\Cli\Utils;
 
-$utils = new Utils();
+$settings = [
+    'colorError' => 'red',
+    'colorSuccess' => 'green',
+    'colorNotice' => 'yellow',
+];
+
+
+$utils = new Utils($settings);
 
 if ($utils->isCli()) {
-    echo $utils->colorOutput("You are in a console\n");
+    echo ("You are in a console\n");
 }
 
 if ($utils->isRoot()) {
-    echo $utils->colorOutput("You are root\n");
+    echo $utils->colorOutput("You are root\n", 'notice');
 } else {
-    echo $utils->colorOutput ("You are not root\n");
+    echo $utils->colorOutput ("You are not root\n", 'error');
 }
+
+echo "Built-in colors: 'notice', 'success', 'error' can be set in the constructor\n";
+echo $notice_str = $utils->colorOutput("Build in notice color\n", 'notice');
+echo $success_str = $utils->colorOutput("Build in success color\n", 'success');
+echo $error_str = $utils->colorOutput("Build in error color\n", 'error');
+
 
 $green_str = $utils->colorOutput('Test green', 'green');
 echo $green_str . "\n";
