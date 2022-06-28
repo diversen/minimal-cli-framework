@@ -5,36 +5,47 @@ namespace Diversen;
 use Diversen\Padding;
 use Diversen\ParseArgv;
 use Diversen\Cli\Utils;
+use Exception;
 
 class MinimalCli
 {
-
-    protected $utils;
-    public function __construct($settings = []){
-        $this->utils = new Utils($settings);
-    }
-
-    /**
-     * Array holding command objects
-     * @var array $commands
-     */
-    public $commands = [];
 
     /**
      *
      * @var \Diversen\parseArgv
      */
-    public $parse = null;
+    protected $parse_argv = null;
 
     /**
-     * Set a header notice
+     * @var \Diversen\CLI\Utils
      */
-    public $header = 'Minimal-cli-framework';
+    protected $utils;
+
+    /**
+     * @var \Diversen\Padding
+     */
+    protected $padding;
+
+    /**
+     * Array holding command objects
+     */
+    public $commands = [];
+
+    /**
+     * default program
+     */
+    public $header = 'Program 0.0.1';
 
     /**
      * Newline definition
      */
-    private $NL = "\n";
+    protected $NL = PHP_EOL;
+
+    public function __construct($settings = []){
+        $this->utils = new Utils($settings);
+        $this->parse_argv = new ParseArgv();
+        $this->padding = new Padding();
+    }
 
     /**
      * Get main options that all commands has access to.
@@ -66,12 +77,39 @@ class MinimalCli
     }
 
     /**
+     * Add a command to a program
+     */
+    public function addCommandObject(string $name, Object $command) {
+      
+        if (!method_exists($command, 'runCommand') && !method_exists($command, 'getCommand')) {
+            throw new Exception('A command needs a `runCommand` and a `getCommand`');
+        }
+        $this->commands[$name] = $command;
+    }
+
+    /**
+     * Add a class to a program
+     */
+    public function addCommandClass(string $name, string $class) {
+      
+        $obj = new $class();
+        $this->commands[$name] = $obj;
+    }
+
+    /**
+     * Set the program header
+     */
+    public function setHeader(string $header) {
+        $this->header = $header;
+    }
+
+    /**
      * Run the main script
      */
     public function runMain()
     {
-        $this->parse = new ParseArgv();
-        $command = $this->parse->getArgument(0);
+
+        $command = $this->parse_argv->getArgument(0);
 
         if (!$command) {
             $this->executeMainHelp();
@@ -80,23 +118,22 @@ class MinimalCli
         else if (isset($this->commands[$command])) {
 
             // Unset command from arguments
-            $this->parse->unsetArgument(0);
+            $this->parse_argv->unsetArgument(0);
             $res = $this->executeCommand($command);
             exit($res);
         }
 
         else {
-            echo $this->utils->colorOutput('No valid command', 'error') . PHP_EOL;    
+            echo $this->utils->colorOutput('No valid command', 'error') . $this->NL;    
         }
-
-        
+  
         exit(1);
     }
 
     /**
      * Get help section of all commands as an array
      */
-    private function getAllCommandsHelp()
+    private function getAllCommandsHelp(): array
     {
 
         $help = [];
@@ -116,8 +153,6 @@ class MinimalCli
 
         $str = $this->header . $this->NL . $this->NL;
 
-        $p = new Padding();
-
         $help_main = $this->getHelpMain();
 
         // Usage
@@ -133,7 +168,7 @@ class MinimalCli
         }
 
         $str .= $this->utils->colorOutput('Options across all commands', 'notice') . $this->NL;
-        $str .= $p->padArray($ary_main) . $this->NL;
+        $str .= $this->padding->padArray($ary_main) . $this->NL;
 
         // Show all commands
         $help_ary = $this->getAllCommandsHelp();
@@ -147,7 +182,7 @@ class MinimalCli
         }
 
         $str .= $this->utils->colorOutput("Available commands", 'notice') . $this->NL;
-        $str .= $p->padArray($command_ary);
+        $str .= $this->padding->padArray($command_ary);
         echo $str;
     }
 
@@ -156,7 +191,7 @@ class MinimalCli
      * Return an empty array if no command option or command arguments
      * @param array $command
      */
-    private function validateHelp($command)
+    private function validateHelp(array $command): array
     {
         if (!isset($command['options'])) {
             $command['options'] = [];
@@ -169,9 +204,8 @@ class MinimalCli
 
     /**
      * Execute a command
-     * @param string $command
      */
-    private function executeCommand($command)
+    private function executeCommand(string $command)
     {
 
         // Rewrite shorthand options
@@ -180,18 +214,18 @@ class MinimalCli
         $this->rewriteShorthandOptions($allowed_options);
 
         $command_obj = $this->commands[$command];
-        if (isset($this->parse->options['help'])) {
+        if (isset($this->parse_argv->options['help'])) {
             $this->executeCommandHelp($command);
             exit(0);
         }
 
         if ($this->validateCommandOptions($command) !== true) {
             $invalid_option = $this->validateCommandOptions($command);
-            echo $this->utils->colorOutput($invalid_option . " is not allowed as option\n", 'error');
+            echo $this->utils->colorOutput($invalid_option . " is not allowed as option" . $this->NL, 'error');
             exit(128);
         }
 
-        return $command_obj->runCommand($this->parse);
+        return $command_obj->runCommand($this->parse_argv);
     }
 
     /**
@@ -200,7 +234,7 @@ class MinimalCli
     private function rewriteShorthandOptions($allowed_options)
     {
 
-        $options = array_keys($this->parse->options);
+        $options = array_keys($this->parse_argv->options);
         foreach ($options as $option) {
             $this->rewriteShorthand($allowed_options, $option);
         }
@@ -235,9 +269,9 @@ class MinimalCli
         
         // Rewrite if only one possible valid option for the shorthand given
         if ($possible_options === 1) {
-            $value = $this->parse->getOption($option_to_check);
-            $this->parse->options[$set_option] = $value;
-            unset($this->parse->options[$option_to_check]);
+            $value = $this->parse_argv->getOption($option_to_check);
+            $this->parse_argv->options[$set_option] = $value;
+            unset($this->parse_argv->options[$option_to_check]);
             return true;
         } 
 
@@ -259,7 +293,7 @@ class MinimalCli
     private function validateCommandOptions($command)
     {
         $allowed = $this->getAllowedOptions($command);
-        $options = array_keys($this->parse->options);
+        $options = array_keys($this->parse_argv->options);
 
         foreach ($options as $option) {
             if (!in_array($option, $allowed)) {
@@ -312,8 +346,6 @@ class MinimalCli
         $output = $this->utils->colorOutput("Usage", 'notice') . $this->NL;
         $output .= '  ' . $help['usage'] . $this->NL;
 
-        $p = new padding();
-
         $options = $help['options'];
 
         // Fill array with options and descriptions
@@ -327,7 +359,7 @@ class MinimalCli
             }
 
             $output .= $this->utils->colorOutput("Options:", 'notice') . $this->NL;
-            $output .= $p->padArray($ary);
+            $output .= $this->padding->padArray($ary);
         }
 
         // Fill array with arguments and descriptions
@@ -335,14 +367,13 @@ class MinimalCli
         if (!empty($arguments)) {
             $ary = [];
             foreach ($arguments as $argument => $desc) {
-                $ary[] = array(
-                    $this->utils->colorOutput($argument, 'success'), $desc,
-                );
+                $ary[] = [$this->utils->colorOutput($argument, 'success'), $desc];
             }
             $output .= $this->NL;
             $output .= $this->utils->colorOutput("Arguments:", 'notice') . $this->NL;
-            $output .= $p->padArray($ary);
+            $output .= $this->padding->padArray($ary);
         }
+
         echo $output;
     }
 }

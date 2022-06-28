@@ -8,26 +8,32 @@ use Diversen\MinimalCli;
 class echoTest
 {
 
-    // Return main commands help
+    /**
+     *  Get command definition
+     * 'usage', 'options', 'main_options', 'arguments'
+     */
     public function getCommand()
     {
         return [
 
-            'usage' => 'Command to make string to upper and lower case',
+            // Usage of the command
+            'usage' => "Command reads a file and output it in upper or lower case",
 
-            // Command options
+            // Options for only this command
             'options' => [
                 '--up' => 'Will put string in uppercase',
                 '--low' => 'Will put string in lowercase'
             ],
 
-            // Add a main options, which all commands will have access to
+            // Main options, which other commands may have access to
             'main_options' => [
                 '--main' => 'Test with a main option'
             ],
 
+            // Are there any arguments and what are they used for.
+            // This is only for displaying help. Any number of arguments can be
             'arguments' => [
-                'File' => 'Read from a file and out put to stdout'
+                'File' => 'Read from a file and out put to stdout',
             ]
         ];
     }
@@ -68,17 +74,6 @@ class echoTest
 }
 
 /**
- * Create a program where 'echo' is a command
- */
-
-$header = <<<EOF
-TEST ECHO COMMAND
-EOF;
-
-$echo = new echoTest();
-$commands['echo'] = $echo;
-
-/**
  * Default settings for the CLI program. Only colors of output can be used
  * These are the default settings
  */
@@ -89,6 +84,12 @@ $settings = [
 ];
 
 $m = new MinimalCli(['colorError' => 'bg_light_red']);
-$m->commands = $commands;
-$m->header = $header;
+
+// Add class
+$m->addCommandClass('echo', echoTest::class);
+
+// Program header. 
+$m->setHeader("Program Test ECHO command");
+
+// Run CLI program
 $m->runMain();
