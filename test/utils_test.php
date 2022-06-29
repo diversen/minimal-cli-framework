@@ -69,5 +69,5 @@ $answer = $utils->readlineConfirm('Are you sure you want to continue: ');
 echo $utils->colorOutput("You answer evaluates to $answer\n");
 
 echo $utils->colorOutput("Demand root. This is the last test\n");
-$res = $utils->needRoot('You will need to be root to reach the end');
+$res = $utils->needRoot("If not root we will now exit");
 echo $utils->colorOutput("$res is the status of the \$utils->needRoot method\n");
