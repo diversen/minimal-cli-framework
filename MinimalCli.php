@@ -41,7 +41,8 @@ class MinimalCli
      */
     protected $NL = PHP_EOL;
 
-    public function __construct($settings = []){
+    public function __construct($settings = [])
+    {
         $this->utils = new Utils($settings);
         $this->parse_argv = new ParseArgv();
         $this->padding = new Padding();
@@ -76,22 +77,29 @@ class MinimalCli
         return $main_options;
     }
 
+    private function validateCommand($class_or_obj)
+    {
+
+        if (!method_exists($class_or_obj, 'runCommand') && !method_exists($class_or_obj, 'getCommand')) {
+            throw new Exception('A command needs a `runCommand` and a `getCommand`');
+        }
+    }
+
     /**
      * Add a command to a program
      */
-    public function addCommandObject(string $name, Object $command) {
-      
-        if (!method_exists($command, 'runCommand') && !method_exists($command, 'getCommand')) {
-            throw new Exception('A command needs a `runCommand` and a `getCommand`');
-        }
+    public function addCommandObject(string $name, Object $command)
+    {
+        $this->validateCommand($command);
         $this->commands[$name] = $command;
     }
 
     /**
      * Add a class to a program
      */
-    public function addCommandClass(string $name, string $class) {
-      
+    public function addCommandClass(string $name, string $class)
+    {
+        $this->validateCommand($class);
         $obj = new $class();
         $this->commands[$name] = $obj;
     }
@@ -99,7 +107,8 @@ class MinimalCli
     /**
      * Set the program header
      */
-    public function setHeader(string $header) {
+    public function setHeader(string $header)
+    {
         $this->header = $header;
     }
 
@@ -113,20 +122,16 @@ class MinimalCli
 
         if (!$command) {
             $this->executeMainHelp();
-        }
-
-        else if (isset($this->commands[$command])) {
+        } else if (isset($this->commands[$command])) {
 
             // Unset command from arguments
             $this->parse_argv->unsetArgument(0);
             $res = $this->executeCommand($command);
             exit($res);
+        } else {
+            echo $this->utils->colorOutput('No valid command', 'error') . $this->NL;
         }
 
-        else {
-            echo $this->utils->colorOutput('No valid command', 'error') . $this->NL;    
-        }
-  
         exit(1);
     }
 
@@ -266,14 +271,14 @@ class MinimalCli
         }
 
         $possible_options = count($possible);
-        
+
         // Rewrite if only one possible valid option for the shorthand given
         if ($possible_options === 1) {
             $value = $this->parse_argv->getOption($option_to_check);
             $this->parse_argv->options[$set_option] = $value;
             unset($this->parse_argv->options[$option_to_check]);
             return true;
-        } 
+        }
 
         // If the shorthand option give has more than one valid option then exit with an error.
         if ($possible_options > 1) {
