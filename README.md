@@ -27,7 +27,7 @@ Or (shorthand):
 
     php test/test.php echo -u README.md
 
-Which will output the file in uppercase
+Which also will output the file in uppercase
 
 # Helpers
 
