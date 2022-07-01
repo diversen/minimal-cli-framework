@@ -61,10 +61,7 @@ class Utils
     {
 
         $output = '';
-        $output .= "Current command needs to be run as root. E.g. with sudo: ";
-        if (!empty($str)) {
-            $output .= "\nsudo $str";
-        }
+        $output .= "Current command needs to be run as root. E.g. using sudo";
 
         if (!$this->isRoot()) {
             echo $output . PHP_EOL;
@@ -158,14 +155,13 @@ class Utils
 
 
     /**
-     * function for executing commands with php function exec
+     * Execute a command
      * @param   string  $command to execute
-     * @param   boolean $status_message - display a status message (OK or ERROR)
-     * @param   boolean $output - echo output of command
+     * @param   boolean $status_message - display a status message (e.g. [OK] ... or [ERROR] ...)
      * @return  int     $ret the value returned by the shell script being
      *                  executed through exec()
      */
-    public function execCommand(string $command, $status_message = 1, $output = 1)
+    public function exec(string $command, $status_message = 1)
     {
         $shell_output = array();
         exec($command . ' 2>&1', $shell_output, $ret);
@@ -183,11 +179,17 @@ class Utils
         }
 
         $this->shell_output = $this->parseShellArray($shell_output);
-        if ($output) {
-            echo $this->shell_output;
-        }
-
         return $ret;
+    }
+
+    /**
+     * Execute a command without any output
+     * @param   string  $command to execute
+     * @return  int     $ret the value returned by the shell script being
+     *                  executed through exec()
+     */
+    public function execSilent($command) {
+        return $this->exec($command, 0);
     }
 
     /**
