@@ -46,16 +46,16 @@ echo $utils->colorOutput("Executing a command that does not exists (dudida) - an
 $res = $utils->execCommand('dudida', 0, 0);
 echo $utils->colorOutput("$res is the result of the above operation\n", 'light_blue');
 
-echo $utils->colorOutput("Exectuing a command that probably exists (ls)\n");
+echo $utils->colorOutput("Exectuing a command that probably exists. Display status [OK] and output (ls)\n");
 $res = $utils->execCommand('ls -l');
-echo $utils->colorOutput("$res is the result of the above operation\n", 'light_blue');
+echo $utils->colorOutput("$res is the result of the above 'ls -l' operation\n", 'light_blue');
 
-echo $utils->colorOutput("Exectuing a command that probably exists (ls) - but without status and command messages\n");
+echo $utils->colorOutput("Exectuing a command that probably exists (ls) - but without status and output\n");
 $res = $utils->execCommand('ls -l', 0, 0);
-echo $utils->colorOutput("$res is the result of the above operation\n", 'light_blue');
+echo $utils->colorOutput("$res is the result of above 'ls -l' operation\n", 'light_blue');
 
-echo $utils->colorOutput ("All is almost identically with \$utils->systemCommand\n", 'bg_blue');
-echo $utils->colorOutput ("But \$utils->systemCommand will always echo output from the executed command", 'bg_blue');
+echo $utils->colorOutput("Output of last command\n");
+echo $utils->getLastShellOutput();
 
 echo $utils->colorOutput("\nEcho a red status message\n");
 echo $utils->colorOutput("STATUS ", 'red', 'A status about how we are doing!!!');

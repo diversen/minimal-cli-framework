@@ -154,12 +154,14 @@ class Utils
         return;
     }
 
+    private $shell_output = ''; 
+
 
     /**
      * function for executing commands with php function exec
      * @param   string  $command to execute
-     * @param   boolean $status_message display a status message (OK or ERROR)
-     * @param   boolean $output echo output of command or not
+     * @param   boolean $status_message - display a status message (OK or ERROR)
+     * @param   boolean $output - echo output of command
      * @return  int     $ret the value returned by the shell script being
      *                  executed through exec()
      */
@@ -180,39 +182,22 @@ class Utils
             }
         }
 
+        $this->shell_output = $this->parseShellArray($shell_output);
         if ($output) {
-            echo $this->parseShellArray($shell_output);
+            echo $this->shell_output;
         }
 
         return $ret;
     }
 
     /**
-     * function for executing commands with php function system
-     * this will always output the commands messages and errors
-     * @param   string  $command to execute
-     * @param   boolean $status_message display status message of exec command or not
-     * @return  int     $ret the value returned by the shell script being
-     *                  executed through exec()
+     * Return last shell output
      */
-    public function systemCommand($command, $status_message = 1)
+    public function getLastShellOutput()
     {
-
-        system($command . ' 2>&1', $ret);
-        if ($ret == 0) {
-            if ($status_message) {
-                echo $this->colorOutput($this->getColorStatus('[OK]'), $this->colorSuccess);
-                echo $command . PHP_EOL;
-
-            }
-        } else {
-            if ($status_message) {
-                echo $this->colorOutput($this->getColorStatus('[ERROR]'), $this->colorError);
-                echo $command . PHP_EOL;
-            }
-        }
-
-        return $ret;
+        $output = trim($this->shell_output);
+        $this->shell_outout = '';
+        return $output;
     }
 
     /**
@@ -220,7 +205,7 @@ class Utils
      * @param array $output
      * @return string $str
      */
-    public function parseShellArray($output)
+    private function parseShellArray($output)
     {
         if (!is_array($output)) {
             return '';
