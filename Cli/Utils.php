@@ -151,7 +151,15 @@ class Utils
         return;
     }
 
-    private $shell_output = ''; 
+    /**
+     * Stdout
+     */
+    private $stdout = '';
+    
+    /**
+     * Stderr
+     */
+    private $stderr  = '';
 
 
     /**
@@ -163,9 +171,9 @@ class Utils
      */
     public function exec(string $command, $status_message = 1)
     {
-        $shell_output = array();
-        exec($command . ' 2>&1', $shell_output, $ret);
-        if ($ret == 0) {
+
+        $res = $this->procExec($command);
+        if ($res == 0) {
             if ($status_message) {
                 echo $this->colorOutput($this->getColorStatus('[OK]'), $this->colorSuccess);
                 echo $command . PHP_EOL;
@@ -177,10 +185,9 @@ class Utils
                 echo $command . PHP_EOL;
             }
         }
-
-        $this->shell_output = $this->parseShellArray($shell_output);
-        return $ret;
+        return $res;
     }
+
 
     /**
      * Execute a command without any output
@@ -193,30 +200,44 @@ class Utils
     }
 
     /**
-     * Return last shell output
+     * Use proc_open. Easier to separate stdout and stderr
+     * @link https://stackoverflow.com/a/25879953/464549
      */
-    public function getLastShellOutput()
-    {
-        $output = trim($this->shell_output);
-        $this->shell_outout = '';
-        return $output;
+    private function procExec($cmd) {
+        $proc = proc_open($cmd,[
+            1 => ['pipe','w'],
+            2 => ['pipe','w'],
+        ],$pipes);
+        
+        $this->stdout = stream_get_contents($pipes[1]);
+        fclose($pipes[1]);
+
+        $this->stderr = stream_get_contents($pipes[2]);
+        fclose($pipes[2]);
+        
+        return proc_close($proc);
     }
 
     /**
-     * transform an array of output from exec into a single string
-     * @param array $output
-     * @return string $str
+     * Return any message from commandline that are not errors
      */
-    private function parseShellArray($output)
+    public function getStdout()
     {
-        if (!is_array($output)) {
-            return '';
-        }
-        $end_output = '';
-        foreach ($output as $val) {
-            $end_output .= $val . PHP_EOL;
-        }
-        return $end_output;
+        $stdout = $this->stdout;
+
+        $this->stdout = '';
+        return trim($stdout);
+    }
+
+    /**
+     * Return any error messages. You should only use this if
+     * the command that use with `Utils::exec` returns non 0 value 
+     */
+    public function getStderr()
+    {
+        $stderr = $this->stderr;
+        $this->stderr = '';
+        return trim($stderr);
     }
 
     /**

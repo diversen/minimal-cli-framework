@@ -16,6 +16,20 @@ $settings = [
 
 $utils = new Utils($settings);
 
+// Exectuing a command and display a status message [OK] ls -l");
+// Res is the shell result of the command. Normally 0 on success.
+$res = $utils->execSilent('ls -l test && ls -l iwqeruoiiqower');
+if ($res !== 0) {
+
+    // Last part of the command should give an error 'ls -l iwqeruoiiqower'
+    echo $utils->colorOutput("Some error occured\n", 'error');
+    echo $utils->getStderr(). "\n";
+}
+
+// Stdout output
+echo $utils->colorOutput("Stdout output from command\n", 'notice');
+echo $utils->getStdout() . "\n";
+
 // Check if in console
 if ($utils->isCli()) {
     echo ("You are in a console\n");
@@ -37,16 +51,13 @@ echo $error_str = $utils->colorOutput("Built-in error color\n", 'error');
 $green_str = $utils->colorOutput('Test green', 'green');
 echo $green_str . "\n";
 
-// Exectuing a command and display a status message [OK] ls -l");
-// Res is the shell result of the command. Normally 0 on success.
-$res = $utils->exec('ls -l');
 
-// Output from last command output\n";
-echo $utils->getLastShellOutput() . "\n";
 
-// Exectuing a command without any output
-$res = $utils->execSilent('echo "Hello world"');
-echo $utils->getLastShellOutput() . "\n";
+
+
+
+// First part of the command should be ok 'ls -l test'
+echo $utils->getStdout() . "\n";
 
 // Prompt the user for input
 $line = $utils->readSingleline('Command will read a line: ');
