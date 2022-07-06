@@ -51,11 +51,6 @@ echo $error_str = $utils->colorOutput("Built-in error color\n", 'error');
 $green_str = $utils->colorOutput('Test green', 'green');
 echo $green_str . "\n";
 
-
-
-
-
-
 // First part of the command should be ok 'ls -l test'
 echo $utils->getStdout() . "\n";
 
