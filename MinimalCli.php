@@ -34,7 +34,7 @@ class MinimalCli
     /**
      * default program
      */
-    public $header = 'Program 0.0.1';
+    public $header = 'Command Line Tool';
 
     /**
      * Newline definition
@@ -81,12 +81,12 @@ class MinimalCli
     {
 
         if (!method_exists($class_or_obj, 'runCommand') && !method_exists($class_or_obj, 'getCommand')) {
-            throw new Exception('A command needs a `runCommand` and a `getCommand`');
+            throw new Exception('A command needs a `runCommand` and a `getCommand` method');
         }
     }
 
     /**
-     * Add a command to a program
+     * Add a command object to a program 
      */
     public function addCommandObject(string $name, Object $command)
     {
@@ -119,6 +119,7 @@ class MinimalCli
     {
 
         $command = $this->parse_argv->getArgument(0);
+        $command = $this->getCommandShortcut($command);
 
         if (!$command) {
             $this->executeMainHelp();
@@ -134,6 +135,40 @@ class MinimalCli
 
         exit(1);
     }
+
+    /**
+     * Check if the command name is a valid shortcut. 
+     * E.g. 't' for 'translate'.
+     * @return string $command a valid command name or exit the program
+     */
+    private function getCommandShortcut($command_name) {
+        $command_names = array_keys($this->commands);
+        
+        $set_command = '';
+        foreach($command_names as $command) {
+
+            // Check if command_name can be used as shortcut for command
+            if (strpos($command, $command_name) === 0) {
+                $possible[] = $command_name;
+                $set_command = $command;
+            }
+        }
+
+        if (count($possible) === 1) {
+            return $set_command;
+        }
+
+        if (count($possible) > 1) {
+            
+            $str = "Ambiguous shorthand for command given: ";
+            $str .= $this->utils->colorOutput($command_name, 'error') . $this->NL;
+            $str .= "Possible values are: " . $this->utils->colorOutput(implode(', ', $possible), 'notice') . $this->NL;
+            echo $str;
+            exit(128);
+            
+        }
+    }
+    
 
     /**
      * Get help section of all commands as an array
@@ -263,7 +298,7 @@ class MinimalCli
                 return;
             }
 
-            // Match between allowed option adnd option to check 
+            // Match between allowed option and option to check 
             if (strpos($option, $option_to_check) === 0) {
                 $possible[] = $option;
                 $set_option = $option;
