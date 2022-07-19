@@ -145,6 +145,7 @@ class MinimalCli
         $command_names = array_keys($this->commands);
         
         $set_command = '';
+        $possible = [];
         foreach($command_names as $command) {
 
             // Check if command_name can be used as shortcut for command
