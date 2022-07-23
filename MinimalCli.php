@@ -142,10 +142,13 @@ class MinimalCli
      * @return string $command a valid command name or exit the program
      */
     private function getCommandShortcut($command_name) {
+        
+        if (!$command_name) return;
         $command_names = array_keys($this->commands);
         
         $set_command = '';
         $possible = [];
+        
         foreach($command_names as $command) {
 
             // Check if command_name can be used as shortcut for command
