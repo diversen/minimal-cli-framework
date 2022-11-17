@@ -64,8 +64,8 @@ class MinimalCli
         ];
 
         // Get all commands main options
-        $help_ary = $this->getAllCommandsHelp();
-        foreach ($help_ary as $val) {
+        $definitions = $this->getAllCommandDefinitions();
+        foreach ($definitions as $val) {
             if (isset($val['main_options'])) {
                 $main_options['main_options'] = array_merge(
                     $main_options['main_options'],
@@ -141,15 +141,16 @@ class MinimalCli
      * E.g. 't' for 'translate'.
      * @return string $command a valid command name or exit the program
      */
-    private function getCommandShortcut($command_name) {
-        
+    private function getCommandShortcut($command_name)
+    {
+
         if (!$command_name) return;
         $command_names = array_keys($this->commands);
-        
+
         $set_command = '';
         $possible = [];
-        
-        foreach($command_names as $command) {
+
+        foreach ($command_names as $command) {
 
             // Check if command_name can be used as shortcut for command
             if (strpos($command, $command_name) === 0) {
@@ -163,28 +164,43 @@ class MinimalCli
         }
 
         if (count($possible) > 1) {
-            
+
             $str = "Ambiguous shorthand for command given: ";
             $str .= $this->utils->colorOutput($command_name, 'error') . $this->NL;
             $str .= "Possible values are: " . $this->utils->colorOutput(implode(', ', $possible), 'notice') . $this->NL;
             echo $str;
             exit(128);
-            
         }
     }
-    
 
     /**
-     * Get help section of all commands as an array
+     * This method is used if no `getCommand` method is defined in a command class
+     * @return array $command
      */
-    private function getAllCommandsHelp(): array
+    private function getDefaultCommand()
+    {
+        return [
+            'usage' => "No usage defined to this command. You may add a `getCommand` method to your command class or you know what you are doing",
+        ];
+    }
+
+
+    /**
+     * Get all definitions of commands.
+     */
+    private function getAllCommandDefinitions(): array
     {
 
-        $help = [];
+        $definitions = [];
         foreach ($this->commands as $command_name => $command_obj) {
-            $help[$command_name] = $command_obj->getCommand();
+            // Check if command has a getCommand method
+            if (method_exists($command_obj, 'getCommand')) {
+                $definitions[$command_name] = $command_obj->getCommand();
+            } else {
+                $definitions[$command_name] = $this->getDefaultCommand();
+            }
         }
-        return $help;
+        return $definitions;
     }
 
     /**
@@ -215,10 +231,10 @@ class MinimalCli
         $str .= $this->padding->padArray($ary_main) . $this->NL;
 
         // Show all commands
-        $help_ary = $this->getAllCommandsHelp();
+        $definitions = $this->getAllCommandDefinitions();
 
         $command_ary = [];
-        foreach ($help_ary as $command_name => $command_help) {
+        foreach ($definitions as $command_name => $command_help) {
             $command = [];
             $command[] = $this->utils->colorOutput($command_name, 'success');
             $command[] = $command_help['usage'];
@@ -360,10 +376,10 @@ class MinimalCli
         $allowed_options = array_keys($main['main_options']);
 
         // Allow command options
-        $command_help = $this->getAllCommandsHelp();
-        if (isset($command_help[$command])) {
-            $command_help[$command] = $this->validateHelp($command_help[$command]);
-            $allowed_command_options = array_keys($command_help[$command]['options']);
+        $definitions = $this->getAllCommandDefinitions();
+        if (isset($definitions[$command])) {
+            $definitions[$command] = $this->validateHelp($definitions[$command]);
+            $allowed_command_options = array_keys($definitions[$command]['options']);
             $allowed_options = array_merge($allowed_options, $allowed_command_options);
         }
 
