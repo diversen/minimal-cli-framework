@@ -41,6 +41,11 @@ class MinimalCli
      */
     protected $NL = PHP_EOL;
 
+    /**
+     * Default command usage description if not set in command class `getCommand` method
+     */
+    private $default_usage = "No usage defined to this command.";
+
     public function __construct($settings = [])
     {
         $this->utils = new Utils($settings);
@@ -180,7 +185,7 @@ class MinimalCli
     private function getDefaultCommand()
     {
         return [
-            'usage' => "No usage defined to this command. You may add a `getCommand` method to your command class or you know what you are doing",
+            'usage' => $this->default_usage,
         ];
     }
 
@@ -193,13 +198,19 @@ class MinimalCli
 
         $definitions = [];
         foreach ($this->commands as $command_name => $command_obj) {
-            // Check if command has a getCommand method
+            $definition = [];
             if (method_exists($command_obj, 'getCommand')) {
-                $definitions[$command_name] = $command_obj->getCommand();
+                $definition = $command_obj->getCommand();
+                if (!isset($definition['usage'])) {
+                    $definition['usage'] = $this->default_usage;
+                }
             } else {
-                $definitions[$command_name] = $this->getDefaultCommand();
+                $definition = $this->getDefaultCommand();
             }
+
+            $definitions[$command_name] = $definition;
         }
+        
         return $definitions;
     }
 
@@ -251,7 +262,7 @@ class MinimalCli
      * Return an empty array if no command option or command arguments
      * @param array $command
      */
-    private function validateHelp(array $command): array
+    private function sanitizeCommandDefinition(array $command): array
     {
         if (!isset($command['options'])) {
             $command['options'] = [];
@@ -378,7 +389,7 @@ class MinimalCli
         // Allow command options
         $definitions = $this->getAllCommandDefinitions();
         if (isset($definitions[$command])) {
-            $definitions[$command] = $this->validateHelp($definitions[$command]);
+            $definitions[$command] = $this->sanitizeCommandDefinition($definitions[$command]);
             $allowed_command_options = array_keys($definitions[$command]['options']);
             $allowed_options = array_merge($allowed_options, $allowed_command_options);
         }
@@ -398,15 +409,13 @@ class MinimalCli
      */
     private function executeCommandHelp($command)
     {
-        $obj = $this->commands[$command];
-        $help = $obj->getCommand();
-        $help = $this->validateHelp($help);
+        $command_definitions = $this->getAllCommandDefinitions();
+        $definition = $this->sanitizeCommandDefinition($command_definitions[$command]);
 
-        // Usage should always be set
         $output = $this->utils->colorOutput("Usage", 'notice') . $this->NL;
-        $output .= '  ' . $help['usage'] . $this->NL;
+        $output .= '  ' . $definition['usage'] . $this->NL;
 
-        $options = $help['options'];
+        $options = $definition['options'];
 
         // Fill array with options and descriptions
         $ary = [];
@@ -423,7 +432,7 @@ class MinimalCli
         }
 
         // Fill array with arguments and descriptions
-        $arguments = $help['arguments'];
+        $arguments = $definition['arguments'];
         if (!empty($arguments)) {
             $ary = [];
             foreach ($arguments as $argument => $desc) {

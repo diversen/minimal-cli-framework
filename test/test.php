@@ -14,6 +14,7 @@ class echoTest
      */
     public function getCommand()
     {
+
         return [
 
             // Usage of the command
@@ -60,13 +61,11 @@ class echoTest
 
         if ($args->getOption('up')) {
             $output = strtoupper($input) . PHP_EOL;
-        }
-        else if ($args->getOption('low')) {
+        } else if ($args->getOption('low')) {
             $output = strtolower($input) . PHP_EOL;
-        } 
-        else {
+        } else {
             $output = $input . PHP_EOL;
-        } 
+        }
 
         echo $output;
         return 0;
