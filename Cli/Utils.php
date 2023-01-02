@@ -1,8 +1,11 @@
 <?php
 
+declare(strict_types = 1);
+
 namespace Diversen\Cli;
 
 use PHP_Parallel_Lint\PhpConsoleColor\ConsoleColor;
+use Exception;
 
 /**
  * common helper function in CLI env.
@@ -88,22 +91,27 @@ class Utils
     public function colorOutput($str, $color = 'notice')
     {
 
+        $use_color = null;
         if ($color == 'notice') {
-            $color = $this->colorNotice;
+            $use_color = $this->colorNotice;
         }
 
         if ($color == 'success') {
-            $color = $this->colorSuccess;
+            $use_color = $this->colorSuccess;
         }
 
         if ($color == 'error') {
-            $color = $this->colorError;
+            $use_color = $this->colorError;
+        }
+
+        if (!$use_color) {
+            throw new Exception("Color $color not found. It has to be one of 'notice', 'success' or 'error'.", 1);
         }
 
         
         $consoleColor = new ConsoleColor();
         if ($consoleColor->isSupported()) {
-            return $consoleColor->apply("$color", $str);
+            return $consoleColor->apply("$use_color", $str);
         }
         return $str;
     }
