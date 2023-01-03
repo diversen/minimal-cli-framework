@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "e7c74d029e97d38e137bf3a4ecf7aa34",
+    "content-hash": "77ed25216e9bda97c87ae6b703d756cc",
     "packages": [
         {
             "name": "diversen/console-padding",
@@ -50,16 +50,16 @@
         },
         {
             "name": "diversen/parse-argv",
-            "version": "v3.0.2",
+            "version": "v3.0.4",
             "source": {
                 "type": "git",
                 "url": "https://github.com/diversen/parse-argv.git",
-                "reference": "42c53eb3108157cbe88bea16d8b5c6b3dd6eeff6"
+                "reference": "87dfac35cce1ec86d289a603c25ede5623f896a2"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/diversen/parse-argv/zipball/42c53eb3108157cbe88bea16d8b5c6b3dd6eeff6",
-                "reference": "42c53eb3108157cbe88bea16d8b5c6b3dd6eeff6",
+                "url": "https://api.github.com/repos/diversen/parse-argv/zipball/87dfac35cce1ec86d289a603c25ede5623f896a2",
+                "reference": "87dfac35cce1ec86d289a603c25ede5623f896a2",
                 "shasum": ""
             },
             "require-dev": {
@@ -92,9 +92,9 @@
             ],
             "support": {
                 "issues": "https://github.com/diversen/parse-argv/issues",
-                "source": "https://github.com/diversen/parse-argv/tree/v3.0.2"
+                "source": "https://github.com/diversen/parse-argv/tree/v3.0.4"
             },
-            "time": "2022-06-28T15:47:21+00:00"
+            "time": "2022-07-04T15:44:20+00:00"
         },
         {
             "name": "php-parallel-lint/php-console-color",
@@ -154,5 +154,5 @@
     "prefer-lowest": false,
     "platform": [],
     "platform-dev": [],
-    "plugin-api-version": "2.2.0"
+    "plugin-api-version": "2.3.0"
 }

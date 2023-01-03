@@ -87,6 +87,8 @@ class Utils
 
     /**
      * Color a string according to a color
+     * Use the build in colors: 'notice', 'success', 'error' 
+     * Or a color supported by the PHP_Parallel_Lint\PhpConsoleColor\ConsoleColor class
      */
     public function colorOutput($str, $color = 'notice')
     {
@@ -105,11 +107,12 @@ class Utils
         }
 
         if (!$use_color) {
-            throw new Exception("Color $color not found. It has to be one of 'notice', 'success' or 'error'.", 1);
+            $use_color = $color;
         }
 
         
         $consoleColor = new ConsoleColor();
+        
         if ($consoleColor->isSupported()) {
             return $consoleColor->apply("$use_color", $str);
         }
