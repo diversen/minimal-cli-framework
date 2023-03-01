@@ -10,43 +10,17 @@ use Exception;
 class MinimalCli
 {
 
-    /**
-     *
-     * @var \Diversen\parseArgv
-     */
-    protected $parse_argv = null;
+    protected ?\Diversen\parseArgv $parse_argv;
+    protected  ?\Diversen\CLI\Utils $utils;
+    protected ?\Diversen\Padding $padding;
 
-    /**
-     * @var \Diversen\CLI\Utils
-     */
-    protected $utils;
+    public array $commands = [];
+    public string $header = 'Command Line Tool';
+    public string $NL = PHP_EOL;
+    
+    private string $default_usage = "No usage defined to this command.";
 
-    /**
-     * @var \Diversen\Padding
-     */
-    protected $padding;
-
-    /**
-     * Array holding command objects
-     */
-    public $commands = [];
-
-    /**
-     * default program
-     */
-    public $header = 'Command Line Tool';
-
-    /**
-     * Newline definition
-     */
-    protected $NL = PHP_EOL;
-
-    /**
-     * Default command usage description if not set in command class `getCommand` method
-     */
-    private $default_usage = "No usage defined to this command.";
-
-    public function __construct($settings = [])
+    public function __construct(array $settings = [])
     {
         $this->utils = new Utils($settings);
         $this->parse_argv = new ParseArgv();
@@ -57,7 +31,7 @@ class MinimalCli
      * Get main options that all commands has access to.
      * @return array $main_options
      */
-    private function getHelpMain()
+    private function getHelpMain(): array
     {
 
         // Built-in main options
@@ -84,24 +58,17 @@ class MinimalCli
 
     private function validateCommand($class_or_obj)
     {
-
-        if (!method_exists($class_or_obj, 'runCommand') && !method_exists($class_or_obj, 'getCommand')) {
+        if (!method_exists($class_or_obj, 'getCommand')) {
             throw new Exception('A command needs a `runCommand` and a `getCommand` method');
         }
     }
 
-    /**
-     * Add a command object to a program 
-     */
     public function addCommandObject(string $name, Object $command)
     {
         $this->validateCommand($command);
         $this->commands[$name] = $command;
     }
 
-    /**
-     * Add a class to a program
-     */
     public function addCommandClass(string $name, string $class)
     {
         $this->validateCommand($class);
@@ -109,17 +76,11 @@ class MinimalCli
         $this->commands[$name] = $obj;
     }
 
-    /**
-     * Set the program header
-     */
     public function setHeader(string $header)
     {
         $this->header = $header;
     }
 
-    /**
-     * Run the main script
-     */
     public function runMain()
     {
 
@@ -144,9 +105,8 @@ class MinimalCli
     /**
      * Check if the command name is a valid shortcut. 
      * E.g. 't' for 'translate'.
-     * @return string $command a valid command name or exit the program
      */
-    private function getCommandShortcut($command_name)
+    private function getCommandShortcut(string $command_name)
     {
 
         if (!$command_name) return;
@@ -210,14 +170,14 @@ class MinimalCli
 
             $definitions[$command_name] = $definition;
         }
-        
+
         return $definitions;
     }
 
     /**
      * Display the main help
      */
-    private function executeMainHelp()
+    private function executeMainHelp(): void
     {
 
         global $argv;
@@ -302,7 +262,7 @@ class MinimalCli
     /**
      * Rewrite short options
      */
-    private function rewriteShorthandOptions($allowed_options)
+    private function rewriteShorthandOptions(array $allowed_options)
     {
 
         $options = array_keys($this->parse_argv->options);
@@ -315,7 +275,8 @@ class MinimalCli
      * Check if an option can be used as shorthand. E.g: '--strtolower' may be an option
      * 
      * Check if e.g. '-s' is set then check if shorthand option is ambiguous
-     * If it is not ambiguous, then set options['strtolower'] with the value 
+     * 
+     * If it is NOT ambiguous, then set options['strtolower'] with the value 
      * */
     private function rewriteShorthand($allowed_options, $option_to_check)
     {
@@ -358,10 +319,8 @@ class MinimalCli
 
     /**
      * Validate options given to a command
-     * @param string the command
-     * @return mixed true if the command is valid or a string with the invalid option
      */
-    private function validateCommandOptions($command)
+    private function validateCommandOptions(string $command)
     {
         $allowed = $this->getAllowedOptions($command);
         $options = array_keys($this->parse_argv->options);
@@ -376,10 +335,8 @@ class MinimalCli
 
     /**
      * Get all allowed options from main and a single command
-     * @param string command
-     * @return array allowed options
      */
-    private function getAllowedOptions($command)
+    private function getAllowedOptions(string $command): array
     {
 
         // Allowed main options
@@ -404,10 +361,9 @@ class MinimalCli
     }
 
     /**
-     * Execute specified command help
-     * @param string $command
+     * Execute a specified command help.
      */
-    private function executeCommandHelp($command)
+    private function executeCommandHelp(string $command)
     {
         $command_definitions = $this->getAllCommandDefinitions();
         $definition = $this->sanitizeCommandDefinition($command_definitions[$command]);
