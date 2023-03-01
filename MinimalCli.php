@@ -106,7 +106,7 @@ class MinimalCli
      * Check if the command name is a valid shortcut. 
      * E.g. 't' for 'translate'.
      */
-    private function getCommandShortcut(string $command_name)
+    private function getCommandShortcut(string $command_name = null)
     {
 
         if (!$command_name) return;
