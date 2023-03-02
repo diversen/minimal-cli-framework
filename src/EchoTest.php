@@ -1,11 +1,8 @@
-#!/usr/bin/env php
 <?php
 
-include_once "vendor/autoload.php";
+namespace Diversen;
 
-use Diversen\MinimalCli;
-
-class echoTest
+class EchoTest
 {
 
     /**
@@ -25,6 +22,10 @@ class echoTest
                 '--up' => 'Will put string in uppercase',
                 '--low' => 'Will put string in lowercase'
             ],
+
+            // 'cast' => [
+            //     'up' => 'int', // Cast to int, bool, float. Default is string
+            // ],
 
             // Main options, which other commands may have access to
             'main_options' => [
@@ -71,24 +72,3 @@ class echoTest
         return 0;
     }
 }
-
-/**
- * Default settings for the CLI program. Only colors of output can be used
- * These are the default settings
- */
-$settings = [
-    'colorError' => 'red',
-    'colorSuccess' => 'green',
-    'colorNotice' => 'yellow',
-];
-
-$m = new MinimalCli(['colorError' => 'bg_light_red']);
-
-// Add class
-$m->addCommandClass('echo', echoTest::class);
-
-// Program header. 
-$m->setHeader("Program Test ECHO command");
-
-// Run CLI program
-$m->runMain();

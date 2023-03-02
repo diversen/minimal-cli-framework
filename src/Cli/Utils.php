@@ -5,7 +5,7 @@ declare(strict_types = 1);
 namespace Diversen\Cli;
 
 use PHP_Parallel_Lint\PhpConsoleColor\ConsoleColor;
-use Exception;
+
 
 /**
  * common helper function in CLI env.
@@ -17,19 +17,29 @@ class Utils
     /**
      * Color of success
      */
-    public $colorSuccess = 'green';
+    public string $colorSuccess = 'green';
 
     /**
      * Color of notice
      */
-    public $colorNotice = 'yellow';
+    public string $colorNotice = 'yellow';
 
     /**
      * Color of error
      */
-    public $colorError = 'red';
+    public string $colorError = 'red';
 
-    public function __construct($settings = null)
+    /**
+     * Stdout
+     */
+    private string $stdout = '';
+    
+    /**
+     * Stderr
+     */
+    private string $stderr  = '';
+
+    public function __construct(array $settings = [])
     {
 
         $this->colorSuccess = $settings['colorSuccess'] ?? $this->colorSuccess;
@@ -161,16 +171,6 @@ class Utils
         }
         return;
     }
-
-    /**
-     * Stdout
-     */
-    private $stdout = '';
-    
-    /**
-     * Stderr
-     */
-    private $stderr  = '';
 
 
     /**

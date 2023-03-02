@@ -12,30 +12,32 @@ of the class `MinimalCli`.
 
 # Example usage
 
-See [test/test.php](test/test.php) which is a program that 
-has a single command `echo`:
+[src/EchoTest.php](src/EchoTest.php) is a command class
+containing a single command `echo` and a couple of options.
+
+This command is added to a simple program in [demos/example.php](demos/example.php)
 
 In order to get help on the usage of the command `echo`:
 
-    php test/test.php echo --help
+    php demos/example.php echo --help
 
 Put a file in uppercase: 
 
-    php test/test.php echo --up README.md
+    php demos/example.php echo --up README.md
 
 Or (shorthand): 
 
-    php test/test.php echo -u README.md
+    php demos/example.php echo -u README.md
 
 Which also will output the file in uppercase
 
-# Helpers
+# Utils
 
-Some common CLI helpers. 
+Some common CLI Utils. 
 
-See [test/utils_test.php](test/utils_test.php)
+See [demos/utils_test.php](demos/utils_test.php)
 
-    php test/utils_test.php 
+    php demos/utils_test.php 
 
 Colors are supported with [https://github.com/php-parallel-lint/PHP-Console-Color](https://github.com/php-parallel-lint/PHP-Console-Color)
 
