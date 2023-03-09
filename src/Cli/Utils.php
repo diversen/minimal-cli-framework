@@ -297,6 +297,11 @@ class Utils
      */
     public function readSingleline($str)
     {
+
+        if (function_exists('readline')) {
+            return readline($str);
+        }
+
         echo $str;
         $out = "";
         $key = "";
