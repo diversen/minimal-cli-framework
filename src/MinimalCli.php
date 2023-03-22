@@ -40,7 +40,7 @@ class MinimalCli
         }
     }
 
-    public function exit($code)
+    public function exit($code = 0)
     {
         if ($this->test_mode) {
             return $code;
