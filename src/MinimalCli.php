@@ -13,6 +13,7 @@ class MinimalCli
     protected ?\Diversen\parseArgv $parse_argv;
     protected ?\Diversen\CLI\Utils $utils;
     protected ?\Diversen\Padding $padding;
+    private bool $will_exit = true;
 
     public array $commands = [];
     public string $header = 'Command Line Tool';
@@ -25,6 +26,24 @@ class MinimalCli
         $this->utils = new Utils($settings);
         $this->parse_argv = new ParseArgv();
         $this->padding = new Padding();
+    }
+
+    /**
+     * Indicate if the program should exit or not.
+     * If false the exit code will be returned. (For testing purposes)
+     */
+    public function setExitMode(bool $will_exit)
+    {
+        $this->will_exit = $will_exit;
+    }
+
+    public function exit(int $code)
+    {
+        if (!$this->will_exit) {
+            return $code;
+        }
+        
+        exit($code);
     }
 
 
@@ -53,12 +72,12 @@ class MinimalCli
             // Unset command from arguments
             $this->parse_argv->unsetArgument(0);
             $res = $this->executeCommand($command);
-            exit($res);
+            return $this->exit($res);
         } else {
             echo $this->utils->colorOutput('No valid command', 'error') . $this->NL;
         }
 
-        exit(1);
+        return $this->exit(1);
     }
 
     /**
@@ -129,7 +148,8 @@ class MinimalCli
             $str .= $this->utils->colorOutput($command_name, 'error') . $this->NL;
             $str .= "Possible values are: " . $this->utils->colorOutput(implode(', ', $possible), 'notice') . $this->NL;
             echo $str;
-            exit(128);
+
+            return $this->exit(128);
         }
     }
 
@@ -245,13 +265,13 @@ class MinimalCli
         $command_obj = $this->commands[$command];
         if (isset($this->parse_argv->options['help'])) {
             $this->executeCommandHelp($command);
-            exit(0);
+            return $this->exit(0);
         }
 
         if ($this->validateCommandOptions($command) !== true) {
             $invalid_option = $this->validateCommandOptions($command);
             echo $this->utils->colorOutput($invalid_option . " is not allowed as option" . $this->NL, 'error');
-            exit(128);
+            return $this->exit(128);
         }
 
         $command_definition = $command_obj->getCommand();
@@ -316,7 +336,7 @@ class MinimalCli
             $str .= $this->utils->colorOutput($option_to_check, 'error') . $this->NL;
             $str .= "Possible values are: " . $this->utils->colorOutput(implode(', ', $possible), 'notice') . $this->NL;
             echo $str;
-            exit(128);
+            return $this->exit(128);
         }
     }
 
