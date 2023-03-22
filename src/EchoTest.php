@@ -4,6 +4,11 @@ namespace Diversen;
 
 class EchoTest
 {
+    private $utils;
+    public function __construct()
+    {
+        $this->utils = new \Diversen\Cli\Utils();
+    }
 
     /**
      *  Get command definition
@@ -35,9 +40,22 @@ class EchoTest
             // Are there any arguments and what are they used for.
             // This is only for displaying help. Any number of arguments can be
             'arguments' => [
-                'File' => 'Read from a file and out put to stdout',
+                'File' => 'Read from a file and out put to stdout. You can also pipe input to the command',
             ]
         ];
+    }
+
+    private function getFileContents($file)
+    {
+        if (!file_exists($file)) {
+            return false;
+        }
+        if (!file_exists($file)) {
+            return false;
+        }
+
+        $input = file_get_contents($file);
+        return $input;
     }
 
     /**
@@ -47,18 +65,15 @@ class EchoTest
     public function runCommand(\Diversen\ParseArgv $args)
     {
 
-        $file = $args->getArgument(0);
-        if (!$file) {
-            echo "No file was specified" . PHP_EOL;
-            return 12;
+        $input = $this->utils->readStdin();
+        if (empty($input)) {
+            $file = $args->getArgument(0);
+            $input = $this->getFileContents($file);
+            if (!$input) {
+                echo "No content was piped to STDIN or file was not specified" . PHP_EOL;
+                return 12;
+            }
         }
-
-        if (!file_exists($file)) {
-            echo "No such file" . PHP_EOL;
-            return 12;
-        }
-
-        $input = file_get_contents($file);
 
         if ($args->getOption('up')) {
             $output = strtoupper($input) . PHP_EOL;

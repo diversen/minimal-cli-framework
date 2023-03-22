@@ -199,6 +199,16 @@ class Utils
         return $res;
     }
 
+    public function readStdin() {
+        $stdin = '';
+        stream_set_blocking(STDIN, false);
+        while (FALSE !== ($line = fgets(STDIN))) {
+            $stdin .= $line;
+         }
+
+         return $stdin;
+    }
+
 
     /**
      * Execute a command without any output
