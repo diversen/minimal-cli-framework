@@ -183,7 +183,10 @@ class MinimalCli
 
         // Usage
         $str .= $this->utils->colorOutput('Usage', 'notice') . $this->NL;
-        $str .= '  ' . $this->utils->colorOutput($argv[0], 'success') . ' [--options] [command] [--options] [arguments]';
+
+        $main_script = $argv[0];
+        $main_command = basename($main_script);
+        $str .= '  ' . $this->utils->colorOutput($main_command, 'success') . ' [--options] [command] [--options] [arguments]';
         $str .= $this->NL . $this->NL;
 
         // Main options
