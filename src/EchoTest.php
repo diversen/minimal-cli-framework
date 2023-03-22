@@ -50,12 +50,12 @@ class EchoTest
         $file = $args->getArgument(0);
         if (!$file) {
             echo "No file was specified" . PHP_EOL;
-            return 1;
+            return 12;
         }
 
         if (!file_exists($file)) {
             echo "No such file" . PHP_EOL;
-            return 1;
+            return 12;
         }
 
         $input = file_get_contents($file);
