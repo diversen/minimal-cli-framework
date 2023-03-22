@@ -18,7 +18,7 @@ class MinimalCli
     public array $commands = [];
     public string $header = 'Command Line Tool';
     public string $NL = PHP_EOL;
-    
+
     private string $default_usage = "No usage defined to this command.";
 
     public function __construct(array $settings = [])
@@ -45,7 +45,7 @@ class MinimalCli
         if ($this->test_mode) {
             return $code;
         }
-        
+
         exit($code);
     }
 
@@ -73,11 +73,10 @@ class MinimalCli
             $this->parse_argv->unsetArgument(0);
             $res = $this->executeCommand($command);
             return $this->exit($res);
-        } 
+        }
 
         $this->executeMainHelp();
         return $this->exit(1);
-        
     }
 
     /**
@@ -277,7 +276,7 @@ class MinimalCli
         }
 
         $command_definition = $command_obj->getCommand();
-        
+
         $cast = $command_definition['cast'] ?? [];
         $this->parse_argv->castOptions($cast);
 
