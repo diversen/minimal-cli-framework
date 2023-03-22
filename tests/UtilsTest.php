@@ -44,16 +44,16 @@ final class UtilsTest extends TestCase
 
         $this->assertEquals(0, $res);
 
-        $res = $utils->execSilent('thiscommanddoesnotexist');
+        $res = $utils->execSilent('this_command_does_not_exist');
 
-        // Read exit code from weird command: 'thiscommanddoesnotexist'
+        // Read exit code from weird command: 'this_command_does_not_exist'
         $this->assertEquals(127, $res);
 
         // STDOUT should be empty
         $this->assertEquals('', $utils->getStdout());
 
         // But STDERR should contain the error message
-        $this->assertStringContainsString('thiscommanddoesnotexist', $utils->getStderr());
+        $this->assertStringContainsString('this_command_does_not_exist', $utils->getStderr());
 
         // This test should be a legit command
         $res = $utils->exec("echo 'hello world'");
