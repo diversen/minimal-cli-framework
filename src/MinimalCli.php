@@ -13,7 +13,7 @@ class MinimalCli
     protected ?\Diversen\parseArgv $parse_argv;
     protected ?\Diversen\CLI\Utils $utils;
     protected ?\Diversen\Padding $padding;
-    private bool $will_exit = true;
+    private bool $test_mode = false;
 
     public array $commands = [];
     public string $header = 'Command Line Tool';
@@ -29,17 +29,20 @@ class MinimalCli
     }
 
     /**
-     * Indicate if the program should exit or not.
-     * If false the exit code will be returned. (For testing purposes)
+     * Test mode will return exit codes instead of exiting with exit()
+     * @param array $argv
      */
-    public function setExitMode(bool $will_exit)
+    public function setTestMode(array $argv = [])
     {
-        $this->will_exit = $will_exit;
+        $this->test_mode = true;
+        if ($argv) {
+            $this->parse_argv = new ParseArgv($argv);
+        }
     }
 
     public function exit(int $code)
     {
-        if (!$this->will_exit) {
+        if ($this->test_mode) {
             return $code;
         }
         
@@ -64,20 +67,17 @@ class MinimalCli
 
         $command = $this->parse_argv->getArgument(0);
         $command = $this->getCommandShortcut($command);
-
-        if (!$command) {
-            $this->executeMainHelp();
-        } else if (isset($this->commands[$command])) {
-
-            // Unset command from arguments
+        $command_exists = $this->commands[$command] ?? false;
+        if ($command_exists) {
+            // Unset command from arguments and execute
             $this->parse_argv->unsetArgument(0);
             $res = $this->executeCommand($command);
             return $this->exit($res);
-        } else {
-            echo $this->utils->colorOutput('No valid command', 'error') . $this->NL;
-        }
+        } 
 
+        $this->executeMainHelp();
         return $this->exit(1);
+        
     }
 
     /**
@@ -145,12 +145,14 @@ class MinimalCli
         if (count($possible) > 1) {
 
             $str = "Ambiguous shorthand for command given: ";
-            $str .= $this->utils->colorOutput($command_name, 'error') . $this->NL;
-            $str .= "Possible values are: " . $this->utils->colorOutput(implode(', ', $possible), 'notice') . $this->NL;
+            $str .= $this->utils->colorOutput($command_name, 'error') . PHP_EOL;
+            $str .= "Possible values are: " . $this->utils->colorOutput(implode(', ', $possible), 'notice') . PHP_EOL;
             echo $str;
 
             return $this->exit(128);
         }
+
+        return false;
     }
 
     /**
@@ -197,17 +199,17 @@ class MinimalCli
 
         global $argv;
 
-        $str = $this->header . $this->NL . $this->NL;
+        $str = $this->header . PHP_EOL . PHP_EOL;
 
         $help_main = $this->getHelpMain();
 
         // Usage
-        $str .= $this->utils->colorOutput('Usage', 'notice') . $this->NL;
+        $str .= $this->utils->colorOutput('Usage', 'notice') . PHP_EOL;
 
         $main_script = $argv[0];
         $main_command = basename($main_script);
         $str .= '  ' . $this->utils->colorOutput($main_command, 'success') . ' [--options] [command] [--options] [arguments]';
-        $str .= $this->NL . $this->NL;
+        $str .= PHP_EOL . PHP_EOL;
 
         // Main options
         $main_options = $help_main['main_options'];
@@ -216,8 +218,8 @@ class MinimalCli
             $ary_main[] = [$this->utils->colorOutput($option_name, 'success'), $description];
         }
 
-        $str .= $this->utils->colorOutput('Options across all commands', 'notice') . $this->NL;
-        $str .= $this->padding->padArray($ary_main) . $this->NL;
+        $str .= $this->utils->colorOutput('Options across all commands', 'notice') . PHP_EOL;
+        $str .= $this->padding->padArray($ary_main) . PHP_EOL;
 
         // Show all commands
         $definitions = $this->getAllCommandDefinitions();
@@ -230,7 +232,7 @@ class MinimalCli
             $command_ary[] = $command;
         }
 
-        $str .= $this->utils->colorOutput("Available commands", 'notice') . $this->NL;
+        $str .= $this->utils->colorOutput("Available commands", 'notice') . PHP_EOL;
         $str .= $this->padding->padArray($command_ary);
         echo $str;
     }
@@ -270,7 +272,7 @@ class MinimalCli
 
         if ($this->validateCommandOptions($command) !== true) {
             $invalid_option = $this->validateCommandOptions($command);
-            echo $this->utils->colorOutput($invalid_option . " is not allowed as option" . $this->NL, 'error');
+            echo $this->utils->colorOutput($invalid_option . " is not allowed as option" . PHP_EOL, 'error');
             return $this->exit(128);
         }
 
@@ -333,8 +335,8 @@ class MinimalCli
         // If the shorthand option give has more than one valid option then exit with an error.
         if ($possible_options > 1) {
             $str = "Ambiguous shorthand for option given: ";
-            $str .= $this->utils->colorOutput($option_to_check, 'error') . $this->NL;
-            $str .= "Possible values are: " . $this->utils->colorOutput(implode(', ', $possible), 'notice') . $this->NL;
+            $str .= $this->utils->colorOutput($option_to_check, 'error') . PHP_EOL;
+            $str .= "Possible values are: " . $this->utils->colorOutput(implode(', ', $possible), 'notice') . PHP_EOL;
             echo $str;
             return $this->exit(128);
         }
@@ -391,22 +393,22 @@ class MinimalCli
         $command_definitions = $this->getAllCommandDefinitions();
         $definition = $this->sanitizeCommandDefinition($command_definitions[$command]);
 
-        $output = $this->utils->colorOutput("Usage", 'notice') . $this->NL;
-        $output .= '  ' . $definition['usage'] . $this->NL;
+        $output = $this->utils->colorOutput("Usage", 'notice') . PHP_EOL;
+        $output .= '  ' . $definition['usage'] . PHP_EOL;
 
         $options = $definition['options'];
 
         // Fill array with options and descriptions
         $ary = [];
         if (!empty($options)) {
-            $output .= $this->NL;
+            $output .= PHP_EOL;
             foreach ($options as $option => $desc) {
                 $ary[] = array(
                     $this->utils->colorOutput($option, 'success'), $desc,
                 );
             }
 
-            $output .= $this->utils->colorOutput("Options:", 'notice') . $this->NL;
+            $output .= $this->utils->colorOutput("Options:", 'notice') . PHP_EOL;
             $output .= $this->padding->padArray($ary);
         }
 
@@ -417,8 +419,8 @@ class MinimalCli
             foreach ($arguments as $argument => $desc) {
                 $ary[] = [$this->utils->colorOutput($argument, 'success'), $desc];
             }
-            $output .= $this->NL;
-            $output .= $this->utils->colorOutput("Arguments:", 'notice') . $this->NL;
+            $output .= PHP_EOL;
+            $output .= $this->utils->colorOutput("Arguments:", 'notice') . PHP_EOL;
             $output .= $this->padding->padArray($ary);
         }
 
