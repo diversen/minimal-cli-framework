@@ -76,7 +76,12 @@ class MinimalCli
         }
 
         $this->executeMainHelp();
+        if (empty($this->parse_argv->arguments)) {
+            return $this->exit(0);
+        }
+
         return $this->exit(1);
+        
     }
 
     /**
@@ -196,16 +201,13 @@ class MinimalCli
     private function executeMainHelp(): void
     {
 
-        global $argv;
-
         $str = $this->header . PHP_EOL . PHP_EOL;
 
         $help_main = $this->getHelpMain();
 
-        // Usage
         $str .= $this->utils->colorOutput('Usage', 'notice') . PHP_EOL;
 
-        $main_script = $argv[0];
+        $main_script = $this->parse_argv->command_name;
         $main_command = basename($main_script);
         $str .= '  ' . $this->utils->colorOutput($main_command, 'success') . ' [--options] [command] [--options] [arguments]';
         $str .= PHP_EOL . PHP_EOL;

@@ -32,7 +32,7 @@ final class MinimalCliTest extends TestCase
         $minimal_cli->addCommandClass('echo', EchoTest::class);
         $minimal_cli->setTestMode(argv: ['test.php']);
         $res = $minimal_cli->runMain();
-        $this->assertEquals(1, $res);
+        $this->assertEquals(0, $res);
 
         // Correct command given
         $minimal_cli = new MinimalCli();
