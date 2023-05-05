@@ -62,6 +62,17 @@ class MinimalCli
         $this->header = $header;
     }
 
+    private function getDefaultCommand(): ?string {
+        foreach ($this->commands as $name => $command_obj) {
+            $definition =$command_obj->getCommand();
+            $is_default = $definition["is_default"] ?? false;
+            if ($is_default) {
+                return $name;
+            }
+        }
+        return null;
+    }
+
     public function runMain()
     {
 
@@ -71,8 +82,15 @@ class MinimalCli
         if ($command_exists) {
             // Unset command from arguments and execute
             $this->parse_argv->unsetArgument(0);
-            $res = $this->executeCommand($command);
-            return $this->exit($res);
+            $exit_code = $this->executeCommand($command);
+            return $this->exit($exit_code);
+        }
+
+        // Check if there is a default command
+        $default_command = $this->getDefaultCommand();
+        if ($default_command) {
+            $exit_code = $this->executeCommand($default_command);
+            return $this->exit($exit_code);
         }
 
         $this->executeMainHelp();
@@ -163,7 +181,7 @@ class MinimalCli
      * This method is used if no `getCommand` method is defined in a command class
      * @return array $command
      */
-    private function getDefaultCommand()
+    private function getDefaultUsage()
     {
         return [
             'usage' => $this->default_usage,
@@ -186,7 +204,7 @@ class MinimalCli
                     $definition['usage'] = $this->default_usage;
                 }
             } else {
-                $definition = $this->getDefaultCommand();
+                $definition = $this->getDefaultUsage();
             }
 
             $definitions[$command_name] = $definition;

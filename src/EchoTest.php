@@ -40,8 +40,15 @@ class EchoTest
             // Are there any arguments and what are they used for.
             // This is only for displaying help. Any number of arguments can be
             'arguments' => [
-                'File' => 'Read from a file and out put to stdout. You can also pipe input to the command',
-            ]
+                'File' => 'Read from a file and output to stdout. You can also pipe input to the command',
+            ],
+ 
+            // Set a default command if none if given
+            // php demos/example --up README.md
+            // Instead of:
+            // php demos/example echo --up README.md
+            // Then set 'is_default' to true
+            // 'is_default' => true, 
         ];
     }
 
